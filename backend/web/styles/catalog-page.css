@@ -305,6 +305,28 @@
 .p-badge-table { background: rgba(212, 160, 84, 0.15); color: var(--gold); }
 .p-badge-oven { background: rgba(220, 60, 60, 0.15); color: #dc5050; }
 
+.p-stock {
+  display: inline-block;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.65rem;
+  border-radius: 50px;
+  margin-left: 0.5rem;
+}
+.p-stock-available {
+  background: rgba(80, 200, 120, 0.15);
+  color: #50c878;
+  border: 1px solid rgba(80, 200, 120, 0.25);
+}
+.p-stock-unavailable {
+  background: rgba(220, 60, 60, 0.15);
+  color: #e86050;
+  border: 1px solid rgba(220, 60, 60, 0.25);
+}
+
 .p-name {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.3rem;

@@ -11,11 +11,12 @@ import (
 )
 
 type ProductHandler struct {
-	svc *service.ProductService
+	svc          *service.ProductService
+	inventorySvc *service.InventoryService
 }
 
-func NewProductHandler(svc *service.ProductService) *ProductHandler {
-	return &ProductHandler{svc: svc}
+func NewProductHandler(svc *service.ProductService, inventorySvc *service.InventoryService) *ProductHandler {
+	return &ProductHandler{svc: svc, inventorySvc: inventorySvc}
 }
 
 // GetAll handles GET /api/products?category=bowl
@@ -64,6 +65,12 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	product.ID = id
+
+	// Create inventory record for new product
+	if h.inventorySvc != nil {
+		_ = h.inventorySvc.EnsureExists(r.Context(), id)
+	}
+
 	writeJSON(w, http.StatusCreated, dto.ProductFromModel(product))
 }
 

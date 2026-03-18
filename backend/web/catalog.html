@@ -248,6 +248,7 @@
         '<div class="p-image">' + imageHtml + '</div>' +
         '<div class="p-body">' +
           '<span class="p-badge p-badge-' + esc(p.category) + '">' + esc(p.badge) + '</span>' +
+          '<span class="p-stock ' + (p.stock_quantity > 0 ? 'p-stock-available' : 'p-stock-unavailable') + '">' + (p.stock_quantity > 0 ? 'В наличии' : 'Нет в наличии') + '</span>' +
           '<h3 class="p-name">' + esc(p.name) + '</h3>' +
           '<div class="p-specs">' + specsHtml + '</div>' +
           optionsHtml +

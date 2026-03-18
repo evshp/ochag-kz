@@ -21,9 +21,13 @@ function renderCard(p) {
     : '';
   const waText = encodeURIComponent(`Здравствуйте! Интересует ${p.name}`);
 
+  const stockClass = p.stock_quantity > 0 ? 'stock-available' : 'stock-unavailable';
+  const stockText = p.stock_quantity > 0 ? 'В наличии' : 'Нет в наличии';
+
   return `<div class="product-card fade-up" data-cat="${esc(p.category)}">
     <div class="product-body">
       <span class="product-badge ${badgeClass}">${esc(p.badge)}</span>
+      <span class="product-stock ${stockClass}">${stockText}</span>
       <h3 class="product-name">${esc(p.name)}</h3>
       <div class="product-specs">${specsHtml}</div>
       ${optionsHtml}

@@ -13,14 +13,15 @@ type ProductOptionDTO struct {
 }
 
 type ProductResponse struct {
-	ID       int64              `json:"id"`
-	Name     string             `json:"name"`
-	Category string             `json:"category"`
-	Badge    string             `json:"badge"`
-	Price    int                `json:"price"`
-	ImageURL string             `json:"image_url"`
-	Specs    []SpecDTO          `json:"specs"`
-	Options  []ProductOptionDTO `json:"options"`
+	ID            int64              `json:"id"`
+	Name          string             `json:"name"`
+	Category      string             `json:"category"`
+	Badge         string             `json:"badge"`
+	Price         int                `json:"price"`
+	ImageURL      string             `json:"image_url"`
+	StockQuantity int                `json:"stock_quantity"`
+	Specs         []SpecDTO          `json:"specs"`
+	Options       []ProductOptionDTO `json:"options"`
 }
 
 type CreateProductRequest struct {
@@ -91,14 +92,15 @@ func ProductFromModel(p *model.Product) ProductResponse {
 		options = append(options, ProductOptionDTO{Name: o.Name, Price: o.Price})
 	}
 	return ProductResponse{
-		ID:       p.ID,
-		Name:     p.Name,
-		Category: p.Category,
-		Badge:    p.Badge,
-		Price:    p.Price,
-		ImageURL: p.ImageURL,
-		Specs:    specs,
-		Options:  options,
+		ID:            p.ID,
+		Name:          p.Name,
+		Category:      p.Category,
+		Badge:         p.Badge,
+		Price:         p.Price,
+		ImageURL:      p.ImageURL,
+		StockQuantity: p.StockQuantity,
+		Specs:         specs,
+		Options:       options,
 	}
 }
 
