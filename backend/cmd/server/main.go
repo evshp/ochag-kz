@@ -39,15 +39,17 @@ func main() {
 	userRepo := postgres.NewUserRepo(pool)
 	contactRepo := postgres.NewContactRepo(pool)
 	inventoryRepo := postgres.NewInventoryRepo(pool)
+	recommendationRepo := postgres.NewRecommendationRepo(pool)
 
 	// Services
 	productSvc := service.NewProductService(productRepo)
 	authSvc := service.NewAuthService(userRepo, cfg.JWTSecret)
 	contactSvc := service.NewContactService(contactRepo)
 	inventorySvc := service.NewInventoryService(inventoryRepo)
+	recommendationSvc := service.NewRecommendationService(recommendationRepo, productRepo)
 
 	// Handlers
-	productHandler := handler.NewProductHandler(productSvc, inventorySvc)
+	productHandler := handler.NewProductHandler(productSvc, inventorySvc, recommendationSvc)
 	authHandler := handler.NewAuthHandler(authSvc)
 	contactHandler := handler.NewContactHandler(contactSvc)
 	inventoryHandler := handler.NewInventoryHandler(inventorySvc, productSvc)
@@ -75,6 +77,8 @@ func main() {
 				r.Post("/", productHandler.Create)
 				r.Put("/{id}", productHandler.Update)
 				r.Delete("/{id}", productHandler.Delete)
+				r.Get("/{id}/recommendations", productHandler.GetRecommendations)
+				r.Put("/{id}/recommendations", productHandler.SetRecommendations)
 			})
 
 			// Inventory — manager and admin

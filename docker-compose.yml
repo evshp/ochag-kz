@@ -12,7 +12,9 @@ services:
       - ./backend/migrations/002_create_products.up.sql:/docker-entrypoint-initdb.d/02_products.sql:ro
       - ./backend/migrations/003_create_contacts.up.sql:/docker-entrypoint-initdb.d/03_contacts.sql:ro
       - ./backend/migrations/004_add_image_url.up.sql:/docker-entrypoint-initdb.d/04_image_url.sql:ro
-      - ./backend/migrations/seed.sql:/docker-entrypoint-initdb.d/05_seed.sql:ro
+      - ./backend/migrations/005_create_inventory.up.sql:/docker-entrypoint-initdb.d/05_inventory.sql:ro
+      - ./backend/migrations/006_create_recommendations.up.sql:/docker-entrypoint-initdb.d/06_recommendations.sql:ro
+      - ./backend/migrations/seed.sql:/docker-entrypoint-initdb.d/07_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-ochag}"]
       interval: 3s

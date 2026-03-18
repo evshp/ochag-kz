@@ -13,7 +13,8 @@ type ProductOption struct {
 type Product struct {
 	ID            int64
 	Name          string
-	Category      string // bowl, table, oven
+	Description   string
+	Category      string // bowl, table, oven, accessory
 	Badge         string
 	Price         int
 	ImageURL      string

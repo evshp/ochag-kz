@@ -10,7 +10,7 @@ import (
 
 var (
 	ErrProductNotFound = errors.New("product not found")
-	ErrInvalidCategory = errors.New("invalid category: must be bowl, table, or oven")
+	ErrInvalidCategory = errors.New("invalid category: must be bowl, table, oven, or accessory")
 	ErrEmptyName       = errors.New("product name is required")
 	ErrInvalidPrice    = errors.New("price must be positive")
 )
@@ -81,5 +81,5 @@ func validateProduct(p *model.Product) error {
 }
 
 func isValidCategory(c string) bool {
-	return c == "bowl" || c == "table" || c == "oven"
+	return c == "bowl" || c == "table" || c == "oven" || c == "accessory"
 }
