@@ -18,6 +18,7 @@ type ProductResponse struct {
 	Category string             `json:"category"`
 	Badge    string             `json:"badge"`
 	Price    int                `json:"price"`
+	ImageURL string             `json:"image_url"`
 	Specs    []SpecDTO          `json:"specs"`
 	Options  []ProductOptionDTO `json:"options"`
 }
@@ -27,6 +28,7 @@ type CreateProductRequest struct {
 	Category string             `json:"category"`
 	Badge    string             `json:"badge"`
 	Price    int                `json:"price"`
+	ImageURL string             `json:"image_url"`
 	Specs    []SpecDTO          `json:"specs"`
 	Options  []ProductOptionDTO `json:"options"`
 }
@@ -36,6 +38,7 @@ type UpdateProductRequest struct {
 	Category string             `json:"category"`
 	Badge    string             `json:"badge"`
 	Price    int                `json:"price"`
+	ImageURL string             `json:"image_url"`
 	Specs    []SpecDTO          `json:"specs"`
 	Options  []ProductOptionDTO `json:"options"`
 }
@@ -47,6 +50,7 @@ func (r *CreateProductRequest) ToModel() *model.Product {
 		Category: r.Category,
 		Badge:    r.Badge,
 		Price:    r.Price,
+		ImageURL: r.ImageURL,
 	}
 	for _, s := range r.Specs {
 		p.Specs = append(p.Specs, model.Spec{Label: s.Label, Value: s.Value})
@@ -65,6 +69,7 @@ func (r *UpdateProductRequest) ToModel(id int64) *model.Product {
 		Category: r.Category,
 		Badge:    r.Badge,
 		Price:    r.Price,
+		ImageURL: r.ImageURL,
 	}
 	for _, s := range r.Specs {
 		p.Specs = append(p.Specs, model.Spec{Label: s.Label, Value: s.Value})
@@ -91,6 +96,7 @@ func ProductFromModel(p *model.Product) ProductResponse {
 		Category: p.Category,
 		Badge:    p.Badge,
 		Price:    p.Price,
+		ImageURL: p.ImageURL,
 		Specs:    specs,
 		Options:  options,
 	}

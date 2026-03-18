@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
@@ -88,14 +89,20 @@ func main() {
 	webDir := filepath.Join(".", "web")
 	fileServer := http.FileServer(http.Dir(webDir))
 
-	r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
-		// Try to serve the file, fall back to index.html for SPA
-		path := filepath.Join(webDir, r.URL.Path)
-		if _, err := os.Stat(path); os.IsNotExist(err) {
-			http.ServeFile(w, r, filepath.Join(webDir, "index.html"))
+	r.Get("/*", func(w http.ResponseWriter, req *http.Request) {
+		// Try to serve the file first
+		path := filepath.Join(webDir, req.URL.Path)
+		if _, err := os.Stat(path); err == nil {
+			fileServer.ServeHTTP(w, req)
 			return
 		}
-		fileServer.ServeHTTP(w, r)
+
+		// SPA routing: /catalog* → catalog.html, everything else → index.html
+		if strings.HasPrefix(req.URL.Path, "/catalog") {
+			http.ServeFile(w, req, filepath.Join(webDir, "catalog.html"))
+			return
+		}
+		http.ServeFile(w, req, filepath.Join(webDir, "index.html"))
 	})
 
 	// Server with graceful shutdown

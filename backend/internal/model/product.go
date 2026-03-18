@@ -16,6 +16,7 @@ type Product struct {
 	Category string // bowl, table, oven
 	Badge    string
 	Price    int
+	ImageURL string
 	Specs    []Spec
 	Options  []ProductOption
 }
