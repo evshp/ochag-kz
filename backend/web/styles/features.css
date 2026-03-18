@@ -1,0 +1,39 @@
+/* ===== FEATURES ===== */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.feature {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  border-radius: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  transition: all 0.3s;
+}
+
+.feature:hover {
+  border-color: rgba(232, 119, 46, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 40px rgba(232, 119, 46, 0.08);
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.feature h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.feature p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}

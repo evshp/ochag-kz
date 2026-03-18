@@ -1,0 +1,38 @@
+/* ===== SCROLL ANIMATION ===== */
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== HERO ENTRANCE ANIMATION ===== */
+@keyframes heroSlideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes heroFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.hero-content h1 {
+  animation: heroSlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.hero-content .hero-sub {
+  animation: heroSlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+}
+
+.hero-content .hero-btns {
+  animation: heroSlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
+}
+
+.hero-bottom {
+  animation: heroFadeIn 1.2s ease 1s both;
+}

@@ -1,0 +1,120 @@
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-dark);
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 9, 7, 0.9) 0%,
+    rgba(13, 9, 7, 0.4) 20%,
+    rgba(13, 9, 7, 0.15) 40%,
+    rgba(13, 9, 7, 0.1) 55%,
+    rgba(13, 9, 7, 0.3) 70%,
+    rgba(13, 9, 7, 0.85) 88%,
+    rgba(13, 9, 7, 1) 100%
+  );
+  pointer-events: none;
+}
+
+/* Noise texture overlay for atmosphere */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: left;
+  padding: 8rem 3rem 0;
+  max-width: 900px;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.05;
+  margin-bottom: 1.2rem;
+  text-shadow: 0 4px 40px rgba(0,0,0,0.6);
+  letter-spacing: -0.5px;
+}
+
+.hero h1 .fire { color: var(--accent-glow); }
+
+.hero-sub {
+  font-family: var(--font-body);
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+  font-weight: 500;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hero-bottom {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 2rem 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.hero-bottom span {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 1px;
+  font-weight: 400;
+}
+
+.hero-bottom .hero-domain {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 2px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .hero-content { padding: 7rem 1.5rem 0; }
+  .hero h1 { font-size: clamp(2.5rem, 10vw, 3.5rem); }
+}

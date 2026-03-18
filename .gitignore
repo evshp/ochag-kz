@@ -12,6 +12,9 @@ api/node_modules/
 .idea/
 .vscode/
 
+# Go build
+backend/bin/
+
 # Логи
 *.log
 

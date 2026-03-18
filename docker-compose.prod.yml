@@ -1,11 +1,11 @@
 services:
   db:
     image: postgres:16-alpine
-    restart: unless-stopped
+    restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-ochag}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ochag
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./backend/migrations/001_create_users.up.sql:/docker-entrypoint-initdb.d/01_users.sql:ro
@@ -13,25 +13,31 @@ services:
       - ./backend/migrations/003_create_contacts.up.sql:/docker-entrypoint-initdb.d/03_contacts.sql:ro
       - ./backend/migrations/seed.sql:/docker-entrypoint-initdb.d/04_seed.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-ochag}"]
-      interval: 3s
-      timeout: 3s
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ochag"]
+      interval: 5s
+      timeout: 5s
       retries: 10
 
   backend:
     build: ./backend
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
+    restart: always
     environment:
       PORT: 8080
-      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-ochag}?sslmode=disable
-      JWT_SECRET: ${JWT_SECRET:-local-dev-secret}
-    volumes:
-      - ./backend/web:/app/web:ro
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/ochag?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET}
     depends_on:
       db:
         condition: service_healthy
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
 
 volumes:
   pgdata:
