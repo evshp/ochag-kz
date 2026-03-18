@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Панель управления — Очаги и Камины</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0a09;
+      --surface: #1a1210;
+      --surface2: #231815;
+      --border: rgba(255,255,255,0.08);
+      --accent: #c0622a;
+      --accent-hover: #d97234;
+      --text: #f0ebe8;
+      --text-secondary: #9a8f8a;
+      --danger: #b94040;
+      --danger-hover: #d45050;
+      --success: #3a8a4a;
+    }
+
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ===== LOGIN ===== */
+    #login-screen {
+      display: flex; align-items: center; justify-content: center; min-height: 100vh;
+    }
+    .login-box {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 2.5rem; width: 100%; max-width: 360px; text-align: center;
+    }
+    .login-box h1 { font-size: 1.4rem; margin-bottom: 0.4rem; }
+    .login-box p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem; }
+    .login-box input {
+      width: 100%; padding: 0.75rem 1rem; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface2);
+      color: var(--text); font-size: 1rem; margin-bottom: 1rem; outline: none;
+    }
+    .login-box input:focus { border-color: var(--accent); }
+    .login-error { color: #e05555; font-size: 0.85rem; margin-bottom: 0.75rem; display: none; }
+
+    /* ===== LAYOUT ===== */
+    #admin-screen { display: none; }
+    header.admin-header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between;
+    }
+    .admin-header h1 { font-size: 1.1rem; }
+    .admin-header span { color: var(--text-secondary); font-size: 0.85rem; }
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+    /* ===== TOOLBAR ===== */
+    .toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .toolbar h2 { font-size: 1.1rem; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      padding: 0.6rem 1.2rem; border-radius: 8px; border: none;
+      font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: var(--danger-hover); }
+    .btn-ghost {
+      background: transparent; color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+    .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+
+    /* ===== TABLE ===== */
+    .products-table {
+      width: 100%; border-collapse: collapse;
+      background: var(--surface); border-radius: 12px; overflow: hidden;
+    }
+    .products-table th, .products-table td {
+      padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    .products-table th { background: var(--surface2); font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .products-table tr:last-child td { border-bottom: none; }
+    .products-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .category-badge {
+      padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.75rem; font-weight: 500;
+    }
+    .cat-bowl { background: rgba(192,98,42,0.2); color: var(--accent); }
+    .cat-table { background: rgba(60,130,80,0.2); color: #5cb87a; }
+    .cat-oven { background: rgba(80,100,180,0.2); color: #8898e0; }
+    .price-cell { font-weight: 600; white-space: nowrap; }
+    .actions { display: flex; gap: 0.5rem; }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); z-index: 100;
+      align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 2rem; width: 100%; max-width: 680px;
+      margin: auto;
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;
+    }
+    .modal-header h3 { font-size: 1.1rem; }
+    .modal-close { background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; line-height: 1; }
+    .modal-close:hover { color: var(--text); }
+
+    /* ===== FORM ===== */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-field.full { grid-column: 1 / -1; }
+    label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 500; }
+    input[type="text"], input[type="number"], select {
+      padding: 0.65rem 0.9rem; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface2);
+      color: var(--text); font-family: inherit; font-size: 0.95rem; outline: none;
+      width: 100%;
+    }
+    input:focus, select:focus { border-color: var(--accent); }
+    select option { background: var(--surface2); }
+
+    /* Динамические списки (specs, options) */
+    .dynamic-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .dynamic-row { display: flex; gap: 0.5rem; align-items: center; }
+    .dynamic-row input { flex: 1; }
+    .dynamic-row .price-input { width: 120px; flex: none; }
+    .remove-row { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.2rem; line-height: 1; padding: 0 0.3rem; }
+    .remove-row:hover { color: var(--danger-hover); }
+    .add-row-btn {
+      align-self: flex-start; margin-top: 0.25rem;
+      font-size: 0.8rem; padding: 0.35rem 0.8rem;
+    }
+
+    .form-actions {
+      display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;
+      padding-top: 1.5rem; border-top: 1px solid var(--border);
+    }
+
+    /* Loading / empty states */
+    .loading { text-align: center; padding: 3rem; color: var(--text-secondary); }
+    .empty-row td { text-align: center; color: var(--text-secondary); padding: 2rem; }
+
+    @media (max-width: 600px) {
+      main { padding: 1rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .products-table th:nth-child(3),
+      .products-table td:nth-child(3) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== ЭКРАН ВХОДА ===== -->
+<div id="login-screen">
+  <div class="login-box">
+    <h1>Панель управления</h1>
+    <p>Очаги и Камины KZ</p>
+    <input type="password" id="password-input" placeholder="Пароль" autocomplete="current-password">
+    <div class="login-error" id="login-error">Неверный пароль</div>
+    <button class="btn btn-primary" style="width:100%" onclick="login()">Войти</button>
+  </div>
+</div>
+
+<!-- ===== ПАНЕЛЬ АДМИНИСТРАТОРА ===== -->
+<div id="admin-screen">
+  <header class="admin-header">
+    <h1>Очаги и Камины — Управление каталогом</h1>
+    <span id="products-count">Загрузка...</span>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <h2>Товары</h2>
+      <button class="btn btn-primary" onclick="openModal()">+ Добавить товар</button>
+    </div>
+
+    <div id="table-loading" class="loading">Загрузка товаров...</div>
+
+    <table class="products-table" id="products-table" style="display:none">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Название</th>
+          <th>Категория</th>
+          <th>Цена</th>
+          <th>Опции</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody id="products-tbody"></tbody>
+    </table>
+  </main>
+</div>
+
+<!-- ===== МОДАЛЬНОЕ ОКНО ===== -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Добавить товар</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <form id="product-form" onsubmit="saveProduct(event)">
+      <input type="hidden" id="product-id">
+
+      <div class="form-grid">
+        <div class="form-field full">
+          <label>Название</label>
+          <input type="text" id="f-name" required placeholder="Классическая костровая чаша D=1200мм">
+        </div>
+
+        <div class="form-field">
+          <label>Категория</label>
+          <select id="f-category" required>
+            <option value="bowl">Костровая чаша</option>
+            <option value="table">Стол</option>
+            <option value="oven">Печь</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Бейдж (отображается на карточке)</label>
+          <input type="text" id="f-badge" required placeholder="Костровая чаша">
+        </div>
+
+        <div class="form-field">
+          <label>Цена (₸)</label>
+          <input type="number" id="f-price" required min="0" placeholder="180000">
+        </div>
+
+        <div class="form-field">
+          <label>Порядок сортировки</label>
+          <input type="number" id="f-sort" min="0" value="0">
+        </div>
+
+        <!-- Характеристики -->
+        <div class="form-field full">
+          <label>Характеристики</label>
+          <div class="dynamic-list" id="specs-list"></div>
+          <button type="button" class="btn btn-ghost add-row-btn" onclick="addSpec()">+ Добавить характеристику</button>
+        </div>
+
+        <!-- Доп. опции -->
+        <div class="form-field full">
+          <label>Дополнительные опции (отдельные позиции)</label>
+          <div class="dynamic-list" id="options-list"></div>
+          <button type="button" class="btn btn-ghost add-row-btn" onclick="addOption()">+ Добавить опцию</button>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Отмена</button>
+        <button type="submit" class="btn btn-primary" id="save-btn">Сохранить</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const API_URL = '/api';
+  let adminPassword = '';
+  let products = [];
+
+  // ===== AUTH =====
+  document.getElementById('password-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') login();
+  });
+
+  async function login() {
+    const pwd = document.getElementById('password-input').value.trim();
+    if (!pwd) return;
+
+    // Проверяем пароль, попробовав загрузить товары
+    try {
+      const res = await fetch(`${API_URL}/products`);
+      if (!res.ok) throw new Error();
+
+      // Проверяем пароль через тестовый запрос (пустой PUT на несуществующий id)
+      const testRes = await fetch(`${API_URL}/products/0`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Password': pwd },
+        body: JSON.stringify({ name: 'test', category: 'bowl', badge: 'test', price: 0, specs: [] })
+      });
+
+      if (testRes.status === 401) {
+        document.getElementById('login-error').style.display = 'block';
+        return;
+      }
+
+      adminPassword = pwd;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-screen').style.display = 'block';
+      sessionStorage.setItem('adminPwd', pwd);
+      loadProducts();
+    } catch {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  }
+
+  // Автовход если пароль уже был введён
+  window.addEventListener('load', () => {
+    const saved = sessionStorage.getItem('adminPwd');
+    if (saved) {
+      adminPassword = saved;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-screen').style.display = 'block';
+      loadProducts();
+    }
+  });
+
+  // ===== LOAD PRODUCTS =====
+  async function loadProducts() {
+    document.getElementById('table-loading').style.display = 'block';
+    document.getElementById('products-table').style.display = 'none';
+
+    const res = await fetch(`${API_URL}/products`);
+    products = await res.json();
+
+    document.getElementById('products-count').textContent = `${products.length} товаров`;
+    renderTable();
+
+    document.getElementById('table-loading').style.display = 'none';
+    document.getElementById('products-table').style.display = 'table';
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('products-tbody');
+    if (!products.length) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Товаров пока нет</td></tr>';
+      return;
+    }
+
+    const catLabel = { bowl: 'bowl', table: 'table', oven: 'oven' };
+    tbody.innerHTML = products.map(p => `
+      <tr>
+        <td style="color:var(--text-secondary)">${p.sort_order}</td>
+        <td>${escHtml(p.name)}</td>
+        <td><span class="category-badge cat-${p.category}">${escHtml(p.badge)}</span></td>
+        <td class="price-cell">${p.price.toLocaleString('ru-RU')} ₸</td>
+        <td style="color:var(--text-secondary)">${p.options.length} шт.</td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-ghost btn-sm" onclick="openModal(${p.id})">Изменить</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">Удалить</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // ===== MODAL =====
+  function openModal(productId) {
+    document.getElementById('modal-overlay').classList.add('open');
+    document.getElementById('specs-list').innerHTML = '';
+    document.getElementById('options-list').innerHTML = '';
+
+    if (productId) {
+      const p = products.find(x => x.id === productId);
+      document.getElementById('modal-title').textContent = 'Редактировать товар';
+      document.getElementById('product-id').value = p.id;
+      document.getElementById('f-name').value = p.name;
+      document.getElementById('f-category').value = p.category;
+      document.getElementById('f-badge').value = p.badge;
+      document.getElementById('f-price').value = p.price;
+      document.getElementById('f-sort').value = p.sort_order;
+      (p.specs || []).forEach(s => addSpec(s.label, s.value));
+      (p.options || []).forEach(o => addOption(o.name, o.price, o.id));
+    } else {
+      document.getElementById('modal-title').textContent = 'Добавить товар';
+      document.getElementById('product-id').value = '';
+      document.getElementById('product-form').reset();
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+
+  document.getElementById('modal-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  });
+
+  // ===== SPECS =====
+  function addSpec(label = '', value = '') {
+    const row = document.createElement('div');
+    row.className = 'dynamic-row';
+    row.innerHTML = `
+      <input type="text" placeholder="Название (напр. Размер)" value="${escHtml(label)}" data-role="spec-label">
+      <input type="text" placeholder="Значение (напр. 1200×1200 мм)" value="${escHtml(value)}" data-role="spec-value">
+      <button type="button" class="remove-row" onclick="this.parentElement.remove()">×</button>
+    `;
+    document.getElementById('specs-list').appendChild(row);
+  }
+
+  // ===== OPTIONS =====
+  function addOption(name = '', price = '', optionId = '') {
+    const row = document.createElement('div');
+    row.className = 'dynamic-row';
+    row.dataset.optionId = optionId;
+    row.innerHTML = `
+      <input type="text" placeholder="Название опции" value="${escHtml(String(name))}" data-role="opt-name">
+      <input type="number" placeholder="Цена ₸" value="${price}" class="price-input" data-role="opt-price" min="0">
+      <button type="button" class="remove-row" onclick="this.parentElement.remove()">×</button>
+    `;
+    document.getElementById('options-list').appendChild(row);
+  }
+
+  // ===== SAVE =====
+  async function saveProduct(e) {
+    e.preventDefault();
+    const btn = document.getElementById('save-btn');
+    btn.disabled = true;
+    btn.textContent = 'Сохранение...';
+
+    const id = document.getElementById('product-id').value;
+    const specs = [...document.querySelectorAll('#specs-list .dynamic-row')].map(row => ({
+      label: row.querySelector('[data-role="spec-label"]').value,
+      value: row.querySelector('[data-role="spec-value"]').value,
+    })).filter(s => s.label && s.value);
+
+    const optionRows = [...document.querySelectorAll('#options-list .dynamic-row')];
+    const options = optionRows.map(row => ({
+      id: row.dataset.optionId || null,
+      name: row.querySelector('[data-role="opt-name"]').value,
+      price: parseInt(row.querySelector('[data-role="opt-price"]').value) || 0,
+    })).filter(o => o.name);
+
+    const body = {
+      name: document.getElementById('f-name').value,
+      category: document.getElementById('f-category').value,
+      badge: document.getElementById('f-badge').value,
+      price: parseInt(document.getElementById('f-price').value),
+      sort_order: parseInt(document.getElementById('f-sort').value) || 0,
+      specs,
+    };
+
+    try {
+      let savedProduct;
+      if (id) {
+        const res = await fetch(`${API_URL}/products/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminPassword },
+          body: JSON.stringify(body),
+        });
+        if (res.status === 401) { sessionStorage.removeItem('adminPwd'); location.reload(); return; }
+        savedProduct = await res.json();
+      } else {
+        const res = await fetch(`${API_URL}/products`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminPassword },
+          body: JSON.stringify(body),
+        });
+        savedProduct = await res.json();
+      }
+
+      // Синхронизировать опции
+      const productId = savedProduct.id;
+      const existingOptions = savedProduct.options || [];
+      const existingIds = new Set(existingOptions.map(o => String(o.id)));
+
+      // Удалить опции которых больше нет
+      const keepIds = new Set(options.filter(o => o.id).map(o => String(o.id)));
+      for (const opt of existingOptions) {
+        if (!keepIds.has(String(opt.id))) {
+          await fetch(`${API_URL}/options/${opt.id}`, {
+            method: 'DELETE',
+            headers: { 'X-Admin-Password': adminPassword },
+          });
+        }
+      }
+
+      // Добавить/обновить опции
+      for (let i = 0; i < options.length; i++) {
+        const o = options[i];
+        if (o.id && existingIds.has(String(o.id))) {
+          await fetch(`${API_URL}/options/${o.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminPassword },
+            body: JSON.stringify({ name: o.name, price: o.price, sort_order: i }),
+          });
+        } else {
+          await fetch(`${API_URL}/products/${productId}/options`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminPassword },
+            body: JSON.stringify({ name: o.name, price: o.price, sort_order: i }),
+          });
+        }
+      }
+
+      closeModal();
+      await loadProducts();
+    } catch (err) {
+      alert('Ошибка при сохранении: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Сохранить';
+    }
+  }
+
+  // ===== DELETE =====
+  async function deleteProduct(id) {
+    const p = products.find(x => x.id === id);
+    if (!confirm(`Удалить товар "${p.name}"?`)) return;
+
+    await fetch(`${API_URL}/products/${id}`, {
+      method: 'DELETE',
+      headers: { 'X-Admin-Password': adminPassword },
+    });
+    await loadProducts();
+  }
+
+  // ===== UTILS =====
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>

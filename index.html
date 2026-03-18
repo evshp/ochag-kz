@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Очаги и Камины KZ — Уют начинается с огня</title>
+  <meta name="description" content="Костровые чаши, очаги, камины и печи в Казахстане. Высококачественная сталь с жаропрочным покрытием до 600°C.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#0d0907">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-dark: #0d0907;
+      --bg-card: #1a1210;
+      --bg-card-hover: #231a16;
+      --text-primary: #f5ece6;
+      --text-secondary: #c4b5ab;
+      --accent: #e8772e;
+      --accent-glow: #ff9a44;
+      --accent-dark: #c45a10;
+      --gold: #d4a054;
+      --border: rgba(232, 119, 46, 0.15);
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Manrope', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ===== SKIP LINK (accessibility) ===== */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      padding: 0.5rem 1rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 0 0 8px 8px;
+      z-index: 999;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+
+    /* ===== FOCUS STYLES (accessibility) ===== */
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* ===== HEADER / NAV ===== */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1rem 2rem;
+      background: rgba(13, 9, 7, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: padding 0.3s;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .logo span { color: var(--text-primary); }
+
+    nav { display: flex; gap: 2rem; align-items: center; }
+
+    nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: color 0.3s;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    nav a:hover { color: var(--accent); }
+
+    .nav-phone {
+      color: var(--accent) !important;
+      font-weight: 600;
+      text-transform: none !important;
+    }
+
+    .burger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+
+    .burger span {
+      width: 24px;
+      height: 2px;
+      background: var(--text-primary);
+      border-radius: 2px;
+      transition: 0.3s;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-dark);
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+    }
+
+    .hero-bg video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 9, 7, 0.9) 0%,
+        rgba(13, 9, 7, 0.4) 20%,
+        rgba(13, 9, 7, 0.15) 40%,
+        rgba(13, 9, 7, 0.1) 55%,
+        rgba(13, 9, 7, 0.3) 70%,
+        rgba(13, 9, 7, 0.85) 88%,
+        rgba(13, 9, 7, 1) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* Noise texture overlay for atmosphere */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: left;
+      padding: 7rem 3rem 0;
+      max-width: 900px;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 700;
+      font-style: italic;
+      line-height: 1.05;
+      margin-bottom: 1.2rem;
+      text-shadow: 0 4px 40px rgba(0,0,0,0.6);
+      letter-spacing: -0.5px;
+    }
+
+    .hero h1 .fire { color: var(--accent-glow); }
+
+    .hero-sub {
+      font-family: var(--font-body);
+      font-size: clamp(0.8rem, 1.5vw, 1rem);
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 2.5rem;
+      font-weight: 500;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-bottom {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 2rem 4rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .hero-bottom span {
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: 1px;
+      font-weight: 400;
+    }
+
+    .hero-bottom .hero-domain {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 2px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: var(--font-body);
+      text-decoration: none;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      border: none;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 25px rgba(232, 119, 46, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-glow);
+      box-shadow: 0 8px 40px rgba(232, 119, 46, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-outline:hover {
+      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+    }
+
+    /* ===== SECTIONS ===== */
+    section { padding: 5rem 2rem; }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      text-align: center;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .section-title .fire { color: var(--accent); }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 3.5rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      letter-spacing: 0.2px;
+    }
+
+    /* ===== FEATURES ===== */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+
+    .feature {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      border-radius: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+
+    .feature:hover {
+      border-color: rgba(232, 119, 46, 0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 40px rgba(232, 119, 46, 0.08);
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .feature h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .feature p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* ===== CATALOG ===== */
+    #catalog { background: rgba(26, 18, 16, 0.3); }
+
+    .catalog-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 0.6rem 1.5rem;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-family: var(--font-body);
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      transition: all 0.3s;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .product-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .product-card:hover {
+      border-color: rgba(232, 119, 46, 0.35);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+
+    .product-card.hidden { display: none; }
+
+    .product-body { padding: 1.5rem; }
+
+    .product-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .badge-bowl {
+      background: rgba(232, 119, 46, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(232, 119, 46, 0.25);
+    }
+
+    .badge-table {
+      background: rgba(212, 160, 84, 0.15);
+      color: var(--gold);
+      border: 1px solid rgba(212, 160, 84, 0.25);
+    }
+
+    .badge-oven {
+      background: rgba(220, 60, 60, 0.15);
+      color: #e86050;
+      border: 1px solid rgba(220, 60, 60, 0.25);
+    }
+
+    .product-name {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+      font-weight: 600;
+    }
+
+    .product-specs {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .spec {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .spec-label {
+      color: var(--text-secondary);
+      opacity: 0.7;
+      min-width: fit-content;
+    }
+
+    .spec-value { color: var(--text-primary); }
+
+    .product-options {
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+
+    .product-options summary {
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      transition: color 0.3s;
+    }
+
+    .product-options summary:hover { color: var(--accent); }
+
+    .options-list {
+      list-style: none;
+      padding-top: 0.5rem;
+    }
+
+    .options-list li {
+      font-size: 0.83rem;
+      color: var(--text-secondary);
+      padding: 0.25rem 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .options-list li span:last-child {
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .product-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .product-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .product-price small {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .btn-sm {
+      padding: 0.55rem 1.3rem;
+      font-size: 0.85rem;
+    }
+
+    /* ===== CONTACT ===== */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .contact-info { display: flex; flex-direction: column; gap: 2rem; }
+
+    .contact-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .contact-icon {
+      width: 50px;
+      height: 50px;
+      min-width: 50px;
+      border-radius: 12px;
+      background: rgba(232, 119, 46, 0.1);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .contact-item h4 {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+      margin-bottom: 0.25rem;
+    }
+
+    .contact-item a, .contact-item p {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    .contact-item a:hover { color: var(--accent); }
+
+    .socials {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .social-link {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+    }
+
+    .social-link:hover {
+      border-color: var(--accent);
+      background: rgba(232, 119, 46, 0.1);
+      transform: translateY(-3px);
+    }
+
+    .contact-form-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+    }
+
+    .contact-form-wrapper h3 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+
+    .form-group { margin-bottom: 1rem; }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(13, 9, 7, 0.6);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: rgba(184, 168, 158, 0.5); }
+
+    .form-group textarea { resize: vertical; min-height: 100px; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    /* ===== FIRE GLOW DECORATION ===== */
+    .glow {
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232, 119, 46, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .glow-1 { top: -100px; right: -100px; }
+    .glow-2 { bottom: 30%; left: -150px; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (min-width: 769px) {
+      nav { display: flex !important; }
+      .burger { display: none !important; }
+    }
+
+    @media (max-width: 768px) {
+      nav { display: none; }
+      nav.open {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(13, 9, 7, 0.97);
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        z-index: 200;
+      }
+      nav.open a { font-size: 1.3rem; }
+      .burger { display: flex; z-index: 300; }
+      .products { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      section { padding: 3.5rem 1.25rem; }
+      header { padding: 0.75rem 1.25rem; }
+      .hero-content {
+        padding: 7rem 1.5rem 0;
+      }
+      .hero h1 {
+        font-size: clamp(2.5rem, 10vw, 3.5rem);
+      }
+    }
+
+    /* ===== SCROLL ANIMATION ===== */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== HERO ENTRANCE ANIMATION ===== */
+    @keyframes heroSlideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes heroFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .hero-content h1 {
+      animation: heroSlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+    }
+
+    .hero-content .hero-sub {
+      animation: heroSlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+    }
+
+    .hero-content .hero-btns {
+      animation: heroSlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
+    }
+
+    .hero-bottom {
+      animation: heroFadeIn 1.2s ease 1s both;
+    }
+
+    /* ===== DECORATIVE SEPARATOR ===== */
+    .section-sep {
+      display: block;
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      margin: 0 auto 2rem;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+<a href="#catalog" class="skip-link">Перейти к каталогу</a>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+
+<!-- HEADER -->
+<header>
+  <a href="#" class="logo">ОЧАГИ<span>&amp;КАМИНЫ</span></a>
+  <nav id="nav" role="navigation" aria-label="Основная навигация">
+    <a href="#about">О нас</a>
+    <a href="#catalog">Каталог</a>
+    <a href="#contact">Контакты</a>
+    <a href="tel:+77763857050" class="nav-phone">+7 776 385 7050</a>
+  </nav>
+  <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- HERO -->
+<section class="hero" aria-label="Главный баннер">
+  <div class="hero-bg" aria-hidden="true">
+    <video autoplay muted loop playsinline>
+      <source src="hero-fire.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="hero-content">
+    <h1>Уют начинается<br>с <span class="fire">огня</span></h1>
+    <p class="hero-sub">Костровые чаши &bull; Очаги &bull; Камины</p>
+    <div class="hero-btns">
+      <a href="#catalog" class="btn btn-primary">Смотреть каталог</a>
+      <a href="https://wa.me/77763857050" target="_blank" rel="noopener" class="btn btn-outline">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        WhatsApp
+      </a>
+    </div>
+  </div>
+  <div class="hero-bottom">
+    <span class="hero-domain">ochagi-kaminy.kz</span>
+    <span>+7 776 385 7050</span>
+  </div>
+</section>
+
+<!-- ABOUT / FEATURES -->
+<section id="about">
+  <div class="container">
+    <h2 class="section-title fade-up">Почему <span class="fire">выбирают нас</span></h2>
+    <p class="section-subtitle fade-up">Мы производим костровые чаши, очаги и печи из высококачественной стали с жаропрочным покрытием до 600&deg;C</p>
+    <div class="features">
+      <div class="feature fade-up">
+        <span class="feature-icon">&#128293;</span>
+        <h3>Жаропрочное покрытие</h3>
+        <p>Высокотемпературное напыление, выдерживающее нагрев до 600&deg;C</p>
+      </div>
+      <div class="feature fade-up">
+        <span class="feature-icon">&#9878;</span>
+        <h3>Холоднокатаная сталь</h3>
+        <p>Толщина от 0.6 до 3.0 мм в зависимости от модели для максимальной прочности</p>
+      </div>
+      <div class="feature fade-up">
+        <span class="feature-icon">&#128230;</span>
+        <h3>Удобная доставка</h3>
+        <p>Компактная упаковка для безопасной транспортировки по всему Казахстану</p>
+      </div>
+      <div class="feature fade-up">
+        <span class="feature-icon">&#127860;</span>
+        <h3>Гриль и готовка</h3>
+        <p>Встроенные решётки, вертела и дополнительные опции для приготовления</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATALOG -->
+<section id="catalog">
+  <div class="container">
+    <h2 class="section-title fade-up">Наш <span class="fire">каталог</span></h2>
+    <p class="section-subtitle fade-up">Выберите идеальный очаг для вашего дома или участка</p>
+
+    <div class="catalog-tabs fade-up">
+      <button class="tab-btn active" data-filter="all">Все</button>
+      <button class="tab-btn" data-filter="bowl">Костровые чаши</button>
+      <button class="tab-btn" data-filter="table">Столы</button>
+      <button class="tab-btn" data-filter="oven">Печи</button>
+    </div>
+
+    <div class="products" id="products-grid">
+      <!-- Товары загружаются из API -->
+      <p id="products-loading" style="text-align:center;color:var(--text-secondary);grid-column:1/-1;padding:2rem">Загрузка каталога...</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <h2 class="section-title fade-up">Свяжитесь <span class="fire">с нами</span></h2>
+    <p class="section-subtitle fade-up">Ответим на все вопросы и поможем с выбором</p>
+
+    <div class="contact-grid">
+      <div class="contact-info fade-up">
+        <div class="contact-item">
+          <div class="contact-icon">&#128222;</div>
+          <div>
+            <h4>Телефон</h4>
+            <a href="tel:+77763857050">+7 776 385 7050</a>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">&#128172;</div>
+          <div>
+            <h4>WhatsApp</h4>
+            <a href="https://wa.me/77763857050" target="_blank">Написать сообщение</a>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">&#127758;</div>
+          <div>
+            <h4>Сайт</h4>
+            <p>ochagi-kaminy.kz</p>
+          </div>
+        </div>
+
+        <div class="socials">
+          <a href="https://www.instagram.com/ochagi_kaminy.kz" target="_blank" class="social-link" aria-label="Instagram" title="Instagram">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8772e" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e8772e" stroke="none"/></svg>
+          </a>
+          <a href="https://www.tiktok.com/@ochagi_kaminy.kz" target="_blank" class="social-link" aria-label="TikTok" title="TikTok">
+            <svg width="20" height="22" viewBox="0 0 20 22" fill="#e8772e"><path d="M18.6 5.8A5.2 5.2 0 0 1 15.4 4.6V0h-3.8v15.1a3.1 3.1 0 1 1-2.1-2.9V8.3a7 7 0 1 0 6 6.9V8.8a9 9 0 0 0 5.1 1.6V6.5a5.2 5.2 0 0 1-2-.7z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="contact-form-wrapper fade-up">
+        <h3>Оставить заявку</h3>
+        <form id="contactForm">
+          <div class="form-group">
+            <input type="text" placeholder="Ваше имя" required>
+          </div>
+          <div class="form-group">
+            <input type="tel" placeholder="Номер телефона" required>
+          </div>
+          <div class="form-group">
+            <textarea placeholder="Какой товар вас интересует?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">Отправить заявку</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; 2026 Очаги и Камины KZ &mdash; ochagi-kaminy.kz</p>
+</footer>
+
+<script>
+  // ===== CATALOG API =====
+  const API_URL = '/api/products';
+
+  // Резервные данные — показываются если API недоступен
+  const FALLBACK_PRODUCTS = [
+    { id:1,  name:'Классическая костровая чаша D=1200мм',                       category:'bowl',  badge:'Костровая чаша', price:180000, specs:[{label:'Размер',value:'1200 × 1200 × 860 мм'},{label:'Сталь',value:'Холоднокатаная, 1.0 мм'},{label:'Покрытие',value:'Жаропрочное до 600°C'}], options:[{name:'Поддон для угля',price:7000},{name:'Решётка-гриль с электроприводом',price:15000},{name:'Чехол',price:8000},{name:'Кастрюля',price:15000},{name:'Подставка для кастрюли',price:3000}] },
+    { id:2,  name:'Усовершенствованная костровая чаша с нерж. решёткой D=1200мм', category:'bowl',  badge:'Костровая чаша', price:200000, specs:[{label:'Размер',value:'1200 × 1200 × 460 мм'},{label:'Сталь',value:'Холоднокатаная, 1.0 мм'},{label:'Решётка',value:'Нержавеющая сталь'}], options:[{name:'Поддон для угля',price:7000},{name:'Решётка-гриль с электроприводом',price:15000},{name:'Чехол',price:8000},{name:'Кастрюля',price:15000},{name:'Подставка для кастрюли',price:3000}] },
+    { id:3,  name:'Классическая костровая чаша D=900мм',                        category:'bowl',  badge:'Костровая чаша', price:130000, specs:[{label:'Размер',value:'900 × 900 × 640 мм'},{label:'Сталь',value:'Холоднокатаная, 0.8 мм'},{label:'Покрытие',value:'Жаропрочное до 600°C'}], options:[{name:'Чехол',price:8000}] },
+    { id:4,  name:'Усовершенствованная костровая чаша с нерж. решёткой D=900мм',  category:'bowl',  badge:'Костровая чаша', price:150000, specs:[{label:'Размер',value:'900 × 900 × 710 мм'},{label:'Сталь',value:'Холоднокатаная, 0.6 мм'},{label:'Решётка',value:'Нержавеющая сталь'}], options:[{name:'Чехол',price:8000}] },
+    { id:5,  name:'Простая костровая чаша D=900мм',                             category:'bowl',  badge:'Костровая чаша', price:120000, specs:[{label:'Размер',value:'900 × 900 мм'},{label:'Сталь',value:'Холоднокатаная'},{label:'Покрытие',value:'Жаропрочное до 600°C'}], options:[] },
+    { id:6,  name:'Круглый стол D=1200мм',                                      category:'table', badge:'Стол',           price:200000, specs:[{label:'Размер',value:'1200 × 1200 × 730 мм'},{label:'Столешница',value:'Сталь 3.0 мм'},{label:'Покрытие',value:'Жаропрочное до 600°C'}], options:[{name:'Индукционная плита D=32 см',price:30000}] },
+    { id:7,  name:'Печь «Петербург» с коротким дымоходом',                      category:'oven',  badge:'Печь',           price:250000, specs:[{label:'Размер',value:'1240 × 750 × 750 мм'},{label:'Отделка',value:'Медная обработка кромок'},{label:'Гриль',value:'Вращающийся, 3 уровня'}], options:[{name:'Чугунная сковорода',price:15000}] },
+    { id:8,  name:'Печь «Петербург» с длинным дымоходом',                       category:'oven',  badge:'Печь',           price:270000, specs:[{label:'Размер',value:'1740 × 750 × 750 мм'},{label:'Отделка',value:'Медная обработка кромок'},{label:'Гриль',value:'Вращающийся, 3 уровня'}], options:[{name:'Чугунная сковорода',price:15000}] },
+    { id:9,  name:'Квадратная печь с коротким дымоходом',                       category:'oven',  badge:'Печь',           price:180000, specs:[{label:'Размер',value:'1220 × 600 × 600 мм'},{label:'Сталь',value:'Холоднокатаная'},{label:'Гриль',value:'Вращающийся, 2 уровня'}], options:[] },
+    { id:10, name:'Квадратная печь с длинным дымоходом',                        category:'oven',  badge:'Печь',           price:200000, specs:[{label:'Размер',value:'1750 × 600 × 600 мм'},{label:'Сталь',value:'Холоднокатаная'},{label:'Гриль',value:'Вращающийся, 2 уровня'}], options:[] },
+    { id:11, name:'Костровая чаша «Сфера» D=900мм',                             category:'bowl',  badge:'Костровая чаша', price:110000, specs:[{label:'Размер',value:'840 × 840 × 380 мм'},{label:'Сталь',value:'Холоднокатаная'},{label:'Покрытие',value:'Жаропрочное до 600°C'}], options:[{name:'Решётка из нерж. стали',price:10000}] },
+  ];
+
+  function renderCard(p) {
+    const badgeClass = p.category === 'bowl' ? 'badge-bowl' : p.category === 'table' ? 'badge-table' : 'badge-oven';
+    const specsHtml = (p.specs || []).map(s =>
+      `<div class="spec"><span class="spec-label">${s.label}:</span><span class="spec-value">${s.value}</span></div>`
+    ).join('');
+    const optionsHtml = p.options && p.options.length
+      ? `<details class="product-options"><summary>Дополнительные опции</summary><ul class="options-list">${
+          p.options.map(o => `<li><span>${o.name}</span><span>${o.price.toLocaleString('ru-RU')} &#8376;</span></li>`).join('')
+        }</ul></details>`
+      : '';
+    const waText = encodeURIComponent(`Здравствуйте! Интересует ${p.name}`);
+
+    return `<div class="product-card fade-up" data-cat="${p.category}">
+      <div class="product-body">
+        <span class="product-badge ${badgeClass}">${p.badge}</span>
+        <h3 class="product-name">${p.name}</h3>
+        <div class="product-specs">${specsHtml}</div>
+        ${optionsHtml}
+        <div class="product-footer">
+          <div class="product-price">${p.price.toLocaleString('ru-RU')} <small>&#8376;</small></div>
+          <a href="https://wa.me/77763857050?text=${waText}" target="_blank" class="btn btn-primary btn-sm">Заказать</a>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function renderProducts(products) {
+    const grid = document.getElementById('products-grid');
+    grid.innerHTML = products.map(renderCard).join('');
+    initFilter();
+    initScrollAnimations();
+  }
+
+  async function loadProducts() {
+    try {
+      const res = await fetch(API_URL);
+      if (!res.ok) throw new Error('API error');
+      const products = await res.json();
+      renderProducts(products);
+    } catch {
+      renderProducts(FALLBACK_PRODUCTS);
+    }
+  }
+
+  // ===== CATALOG FILTER =====
+  function initFilter() {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const cards = document.querySelectorAll('.product-card');
+    // Reset active tab
+    const activeFilter = document.querySelector('.tab-btn.active')?.dataset.filter || 'all';
+    cards.forEach(c => {
+      c.classList.toggle('hidden', activeFilter !== 'all' && c.dataset.cat !== activeFilter);
+    });
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => { t.classList.remove('active'); t.removeAttribute('aria-current'); });
+        tab.classList.add('active');
+        tab.setAttribute('aria-current', 'true');
+        const f = tab.dataset.filter;
+        document.querySelectorAll('.product-card').forEach(c => {
+          c.classList.toggle('hidden', f !== 'all' && c.dataset.cat !== f);
+        });
+      });
+    });
+  }
+
+  // ===== SCROLL ANIMATIONS =====
+  function initScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-up').forEach((el, i) => {
+      const parent = el.closest('section') || el.closest('.container');
+      const siblings = parent ? parent.querySelectorAll('.fade-up') : [];
+      const idx = Array.from(siblings).indexOf(el);
+      el.style.transitionDelay = (idx * 0.08) + 's';
+      observer.observe(el);
+    });
+  }
+
+  // Инициализация
+  loadProducts();
+  initScrollAnimations(); // для не-каталожных элементов
+
+  // ===== MOBILE MENU =====
+  const burger = document.getElementById('burger');
+  const nav = document.getElementById('nav');
+  burger.addEventListener('click', () => {
+    const isOpen = nav.classList.toggle('open');
+    burger.setAttribute('aria-expanded', isOpen);
+    burger.setAttribute('aria-label', isOpen ? 'Закрыть меню' : 'Открыть меню');
+  });
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    nav.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
+    burger.setAttribute('aria-label', 'Открыть меню');
+  }));
+
+  // ===== FORM → WHATSAPP =====
+  document.getElementById('contactForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const name = form.querySelector('input[type="text"]').value;
+    const phone = form.querySelector('input[type="tel"]').value;
+    const msg = form.querySelector('textarea').value;
+    const text = `Здравствуйте! Меня зовут ${name}. Мой номер: ${phone}. ${msg}`;
+    window.open(`https://wa.me/77763857050?text=${encodeURIComponent(text)}`, '_blank');
+  });
+
+  // ===== HEADER SCROLL SHRINK =====
+  window.addEventListener('scroll', () => {
+    const header = document.querySelector('header');
+    header.style.padding = window.scrollY > 80 ? '0.6rem 2rem' : '';
+  }, { passive: true });
+
+  // ===== FIRE CANVAS ANIMATION =====
+  (function() {
+    const canvas = document.getElementById('fireCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let W, H, dpr;
+    const particles = [];
+    const embers = [];
+    const logs = [];
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = canvas.parentElement.clientWidth;
+      H = canvas.parentElement.clientHeight;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Fire bowl shape
+    const bowlCenterX = () => W * 0.5;
+    const bowlCenterY = () => H * 0.84;
+    const bowlWidth = () => Math.min(W * 0.3, 280);
+    const bowlHeight = () => Math.min(H * 0.05, 35);
+
+    // Create log shapes for the fire bowl
+    function initLogs() {
+      logs.length = 0;
+      const cx = bowlCenterX();
+      const cy = bowlCenterY();
+      const bw = bowlWidth();
+      for (let i = 0; i < 5; i++) {
+        logs.push({
+          x: cx + (Math.random() - 0.5) * bw * 0.7,
+          y: cy + (Math.random() - 0.3) * 20,
+          len: 30 + Math.random() * 50,
+          angle: (Math.random() - 0.5) * 1.2,
+          thickness: 4 + Math.random() * 6,
+        });
+      }
+    }
+    initLogs();
+
+    // Fire particle
+    function spawnFlame() {
+      const cx = bowlCenterX();
+      const cy = bowlCenterY();
+      const bw = bowlWidth();
+      const spread = bw * 0.4;
+      particles.push({
+        x: cx + (Math.random() - 0.5) * spread,
+        y: cy - 5,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: -(1.5 + Math.random() * 3),
+        life: 1,
+        decay: 0.008 + Math.random() * 0.012,
+        size: 12 + Math.random() * 25,
+        wobble: Math.random() * Math.PI * 2,
+        wobbleSpeed: 0.02 + Math.random() * 0.04,
+      });
+    }
+
+    // Ember particle (small floating spark)
+    function spawnEmber() {
+      const cx = bowlCenterX();
+      const cy = bowlCenterY();
+      const bw = bowlWidth();
+      embers.push({
+        x: cx + (Math.random() - 0.5) * bw * 0.3,
+        y: cy - 10 - Math.random() * 40,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: -(0.3 + Math.random() * 1.2),
+        life: 1,
+        decay: 0.003 + Math.random() * 0.008,
+        size: 1 + Math.random() * 2.5,
+      });
+    }
+
+    function drawBowl() {
+      const cx = bowlCenterX();
+      const cy = bowlCenterY();
+      const bw = bowlWidth();
+      const bh = bowlHeight();
+
+      // Bowl body (dark steel)
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + bh * 0.5, bw, bh * 1.8, 0, 0, Math.PI);
+      ctx.fillStyle = '#1a1210';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(80, 55, 35, 0.6)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Bowl rim highlight
+      ctx.beginPath();
+      ctx.ellipse(cx, cy - bh * 0.2, bw, bh, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(140, 90, 50, 0.4)';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // Inner rim reflection
+      ctx.beginPath();
+      ctx.ellipse(cx, cy - bh * 0.2, bw - 4, bh - 2, 0, Math.PI, Math.PI * 2);
+      const rimGrad = ctx.createLinearGradient(cx - bw, cy, cx + bw, cy);
+      rimGrad.addColorStop(0, 'rgba(100, 60, 30, 0)');
+      rimGrad.addColorStop(0.3, 'rgba(160, 100, 50, 0.3)');
+      rimGrad.addColorStop(0.5, 'rgba(200, 130, 60, 0.4)');
+      rimGrad.addColorStop(0.7, 'rgba(160, 100, 50, 0.3)');
+      rimGrad.addColorStop(1, 'rgba(100, 60, 30, 0)');
+      ctx.strokeStyle = rimGrad;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+
+      // Legs
+      const legOffsets = [-0.6, -0.2, 0.2, 0.6];
+      ctx.save();
+      ctx.strokeStyle = 'rgba(60, 40, 25, 0.7)';
+      ctx.lineWidth = 3;
+      legOffsets.forEach(off => {
+        const lx = cx + bw * off;
+        ctx.beginPath();
+        ctx.moveTo(lx, cy + bh * 1.2);
+        ctx.lineTo(lx + off * 15, cy + bh * 1.2 + 45);
+        ctx.stroke();
+      });
+      ctx.restore();
+    }
+
+    function drawLogs() {
+      logs.forEach(log => {
+        ctx.save();
+        ctx.translate(log.x, log.y);
+        ctx.rotate(log.angle);
+        // Log body
+        const grad = ctx.createLinearGradient(-log.len / 2, 0, log.len / 2, 0);
+        grad.addColorStop(0, 'rgba(40, 20, 8, 0.9)');
+        grad.addColorStop(0.3, 'rgba(70, 30, 10, 0.9)');
+        grad.addColorStop(0.6, 'rgba(120, 50, 15, 0.7)');
+        grad.addColorStop(1, 'rgba(50, 25, 8, 0.9)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(-log.len / 2, -log.thickness / 2, log.len, log.thickness, log.thickness / 2);
+        ctx.fill();
+        // Glowing edge
+        ctx.shadowColor = 'rgba(255, 100, 20, 0.4)';
+        ctx.shadowBlur = 8;
+        ctx.strokeStyle = 'rgba(200, 80, 20, 0.3)';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+        ctx.restore();
+      });
+    }
+
+    function drawFlames() {
+      particles.forEach(p => {
+        const alpha = p.life * 0.6;
+        const r = p.size * p.life;
+        // Color transitions: white-yellow -> orange -> red as life decreases
+        let color;
+        if (p.life > 0.7) {
+          const t = (p.life - 0.7) / 0.3;
+          color = `rgba(${255}, ${200 + t * 55}, ${100 + t * 120}, ${alpha})`;
+        } else if (p.life > 0.3) {
+          const t = (p.life - 0.3) / 0.4;
+          color = `rgba(${200 + t * 55}, ${80 + t * 120}, ${10 + t * 30}, ${alpha})`;
+        } else {
+          const t = p.life / 0.3;
+          color = `rgba(${150 + t * 50}, ${20 + t * 60}, ${5}, ${alpha * 0.7})`;
+        }
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+        grad.addColorStop(0, color);
+        grad.addColorStop(0.4, color.replace(alpha + ')', (alpha * 0.5) + ')'));
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        // Flame teardrop shape
+        ctx.ellipse(p.x, p.y, r * 0.6, r, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    function drawEmbers() {
+      embers.forEach(e => {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        const alpha = e.life * 0.8;
+        ctx.shadowColor = `rgba(255, 140, 40, ${alpha})`;
+        ctx.shadowBlur = 6;
+        ctx.fillStyle = `rgba(255, ${160 + Math.random() * 60}, ${40 + Math.random() * 40}, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    function drawAmbientGlow() {
+      const cx = bowlCenterX();
+      const cy = bowlCenterY();
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      const grad = ctx.createRadialGradient(cx, cy - 40, 10, cx, cy - 20, 200);
+      grad.addColorStop(0, 'rgba(255, 140, 40, 0.08)');
+      grad.addColorStop(0.5, 'rgba(200, 80, 20, 0.03)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+    }
+
+    // Draw a subtle floor/ground reflection
+    function drawGround() {
+      const cy = bowlCenterY();
+      const bh = bowlHeight();
+      const groundY = cy + bh * 1.2 + 50;
+      ctx.save();
+      const grad = ctx.createLinearGradient(0, groundY - 30, 0, H);
+      grad.addColorStop(0, 'rgba(20, 12, 8, 0)');
+      grad.addColorStop(0.3, 'rgba(15, 10, 7, 0.5)');
+      grad.addColorStop(1, 'rgba(13, 9, 7, 1)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, groundY - 30, W, H - groundY + 30);
+
+      // Warm reflection on ground
+      ctx.globalCompositeOperation = 'lighter';
+      const reflGrad = ctx.createRadialGradient(bowlCenterX(), groundY, 0, bowlCenterX(), groundY, bowlWidth() * 1.5);
+      reflGrad.addColorStop(0, 'rgba(200, 100, 30, 0.04)');
+      reflGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = reflGrad;
+      ctx.fillRect(0, groundY - 10, W, 120);
+      ctx.restore();
+    }
+
+    // Stars in background
+    const stars = [];
+    for (let i = 0; i < 80; i++) {
+      stars.push({
+        x: Math.random(),
+        y: Math.random() * 0.45,
+        size: 0.3 + Math.random() * 1.2,
+        twinkle: Math.random() * Math.PI * 2,
+        speed: 0.01 + Math.random() * 0.03,
+      });
+    }
+
+    function drawStars() {
+      ctx.save();
+      stars.forEach(s => {
+        const alpha = 0.2 + 0.3 * Math.sin(s.twinkle);
+        ctx.fillStyle = `rgba(200, 190, 180, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(s.x * W, s.y * H, s.size, 0, Math.PI * 2);
+        ctx.fill();
+        s.twinkle += s.speed;
+      });
+      ctx.restore();
+    }
+
+    let frame = 0;
+    function animate() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Dark sky background
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
+      skyGrad.addColorStop(0, '#050308');
+      skyGrad.addColorStop(0.4, '#0a0608');
+      skyGrad.addColorStop(0.7, '#120d0a');
+      skyGrad.addColorStop(1, '#0d0907');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      drawStars();
+      drawGround();
+      drawAmbientGlow();
+      drawBowl();
+      drawLogs();
+
+      // Spawn new flames
+      const spawnRate = Math.max(2, Math.floor(W / 200));
+      for (let i = 0; i < spawnRate; i++) spawnFlame();
+      if (frame % 3 === 0) spawnEmber();
+
+      // Update & draw flames
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.wobble += p.wobbleSpeed;
+        p.x += p.vx + Math.sin(p.wobble) * 0.5;
+        p.y += p.vy;
+        p.vy *= 0.99;
+        p.life -= p.decay;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+
+      // Update & draw embers
+      for (let i = embers.length - 1; i >= 0; i--) {
+        const e = embers[i];
+        e.x += e.vx + Math.sin(frame * 0.02 + i) * 0.15;
+        e.y += e.vy;
+        e.life -= e.decay;
+        if (e.life <= 0) embers.splice(i, 1);
+      }
+
+      drawFlames();
+      drawEmbers();
+
+      frame++;
+      requestAnimationFrame(animate);
+    }
+
+    // Only animate when hero is in view
+    const heroSection = document.querySelector('.hero');
+    let animating = false;
+    const heroObs = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !animating) {
+        animating = true;
+        animate();
+      }
+    }, { threshold: 0.1 });
+    heroObs.observe(heroSection);
+  })();
+</script>
+</body>
+</html>

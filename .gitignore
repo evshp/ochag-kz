@@ -1,0 +1,22 @@
+# Секреты — никогда не коммитить!
+.env
+
+# Node.js
+node_modules/
+api/node_modules/
+
+# MacOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Логи
+*.log
+
+# Большие медиафайлы
+*.mp4
+
+# Прайс-листы (конфиденциальные)
+*.xlsx
