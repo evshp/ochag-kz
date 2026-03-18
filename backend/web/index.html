@@ -95,22 +95,42 @@
 </section>
 
 <!-- CATALOG -->
-<section id="catalog">
-  <div class="container">
-    <h2 class="section-title fade-up">Наш <span class="fire">каталог</span></h2>
-    <p class="section-subtitle fade-up">Выберите идеальный очаг для вашего дома или участка</p>
+<section id="catalog" class="catalog-section">
+  <h2 class="catalog-section-title fade-up">Ката<span class="fire">лог</span></h2>
 
-    <div class="catalog-tabs fade-up">
-      <button class="tab-btn active" data-filter="all">Все</button>
-      <button class="tab-btn" data-filter="bowl">Костровые чаши</button>
-      <button class="tab-btn" data-filter="table">Столы</button>
-      <button class="tab-btn" data-filter="oven">Печи</button>
-    </div>
+  <div class="catalog-categories fade-up">
+    <a href="/catalog/bowl" class="cat-card">
+      <div class="cat-card-image">
+        <svg class="cat-card-icon" viewBox="0 0 120 80" fill="none"><ellipse cx="60" cy="55" rx="50" ry="18" stroke="currentColor" stroke-width="2"/><path d="M20 45 Q30 15 60 10 Q90 15 100 45" stroke="currentColor" stroke-width="2" fill="none"/><path d="M45 20 Q50 5 60 8 Q65 2 70 12" stroke="#e8772e" stroke-width="1.5" opacity="0.7"/></svg>
+      </div>
+      <div class="cat-card-body">
+        <h3>Костровые чаши</h3>
+        <p>Классические и усовершенствованные чаши из холоднокатаной стали</p>
+        <span class="cat-card-link">Смотреть &rarr;</span>
+      </div>
+    </a>
 
-    <div class="products" id="products-grid">
-      <!-- Товары загружаются из API -->
-      <p id="products-loading" style="text-align:center;color:var(--text-secondary);grid-column:1/-1;padding:2rem">Загрузка каталога...</p>
-    </div>
+    <a href="/catalog/table" class="cat-card">
+      <div class="cat-card-image">
+        <svg class="cat-card-icon" viewBox="0 0 120 80" fill="none"><rect x="15" y="20" width="90" height="8" rx="3" stroke="currentColor" stroke-width="2"/><line x1="25" y1="28" x2="25" y2="70" stroke="currentColor" stroke-width="2"/><line x1="95" y1="28" x2="95" y2="70" stroke="currentColor" stroke-width="2"/><ellipse cx="60" cy="15" rx="20" ry="8" stroke="#e8772e" stroke-width="1.5" opacity="0.7"/></svg>
+      </div>
+      <div class="cat-card-body">
+        <h3>Столы</h3>
+        <p>Круглые столы с встроенной костровой зоной</p>
+        <span class="cat-card-link">Смотреть &rarr;</span>
+      </div>
+    </a>
+
+    <a href="/catalog/oven" class="cat-card">
+      <div class="cat-card-image">
+        <svg class="cat-card-icon" viewBox="0 0 120 80" fill="none"><rect x="25" y="15" width="70" height="55" rx="5" stroke="currentColor" stroke-width="2"/><rect x="35" y="25" width="50" height="25" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M50 35 Q55 25 60 30 Q65 22 70 32" stroke="#e8772e" stroke-width="1.5" opacity="0.7"/></svg>
+      </div>
+      <div class="cat-card-body">
+        <h3>Печи</h3>
+        <p>Печи для казана и барбекю с дымоходом</p>
+        <span class="cat-card-link">Смотреть &rarr;</span>
+      </div>
+    </a>
   </div>
 </section>
 
@@ -266,7 +286,37 @@
 
 <!-- FOOTER -->
 <footer>
-  <p>&copy; 2026 Очаги и Камины KZ &mdash; ochagi-kaminy.kz</p>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="logo">ОЧАГИ<span>&amp;КАМИНЫ</span></a>
+      <span class="footer-tagline">Уют начинается с огня</span>
+    </div>
+
+    <div class="footer-social">
+      <span class="footer-social-title">Мы в соцсетях</span>
+      <div class="footer-social-links">
+        <a href="https://www.instagram.com/ochagi_kaminy.kz" target="_blank" rel="noopener" class="footer-social-link" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://www.tiktok.com/@ochagi_kaminy.kz" target="_blank" rel="noopener" class="footer-social-link" aria-label="TikTok">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.73a8.19 8.19 0 004.76 1.52V6.8a4.84 4.84 0 01-1-.11z"/></svg>
+        </a>
+        <a href="https://wa.me/77763857050" target="_blank" rel="noopener" class="footer-social-link" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-contacts">
+      <a href="tel:+77763857050" class="footer-phone">+7 776 385 7050</a>
+      <a href="mailto:info@ochagi-kaminy.kz">info@ochagi-kaminy.kz</a>
+      <a href="https://ochagi-kaminy.kz">ochagi-kaminy.kz</a>
+    </div>
+  </div>
+  <div class="footer-copy">
+    <span>&copy; 2025 Очаги и Камины KZ</span>
+    <span>Казахстан</span>
+  </div>
 </footer>
 
 <script src="js/catalog.js"></script>

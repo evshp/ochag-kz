@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Каталог — Очаги и Камины KZ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/variables.css">
+  <link rel="stylesheet" href="/styles/header.css">
+  <link rel="stylesheet" href="/styles/footer.css">
+  <link rel="stylesheet" href="/styles/catalog-page.css">
+</head>
+<body>
+<!-- HEADER -->
+<header>
+  <a href="/" class="logo">ОЧАГИ<span>&КАМИНЫ</span></a>
+  <nav id="nav" role="navigation">
+    <a href="/">Главная</a>
+    <a href="/catalog" class="active">Каталог</a>
+    <a href="/#contact">Контакты</a>
+    <a href="tel:+77763857050" class="nav-phone">Позвонить</a>
+  </nav>
+  <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- CATALOG: Categories View -->
+<main id="catalogView" class="catalog-page">
+  <div class="catalog-hero">
+    <div class="catalog-hero-bg"></div>
+    <h1 class="catalog-title">Ката<span class="fire">лог</span></h1>
+    <p class="catalog-subtitle">Выберите категорию, чтобы увидеть наши изделия</p>
+  </div>
+
+  <section class="categories-grid">
+    <a href="/catalog/bowl" class="category-card" data-category="bowl">
+      <div class="category-image">
+        <div class="category-placeholder">
+          <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="60" cy="55" rx="50" ry="18" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 45 Q30 15 60 10 Q90 15 100 45" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="M45 20 Q50 5 60 8 Q65 2 70 12" stroke="#e8772e" stroke-width="1.5" opacity="0.7"/>
+            <path d="M55 15 Q58 0 62 5" stroke="#ff9a44" stroke-width="1" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="category-overlay"></div>
+      </div>
+      <div class="category-info">
+        <h2 class="category-name">Костровые чаши</h2>
+        <p class="category-desc">Классические и усовершенствованные костровые чаши из холоднокатаной стали с жаропрочным покрытием</p>
+        <span class="category-count" data-cat="bowl"></span>
+        <span class="category-arrow">&rarr;</span>
+      </div>
+    </a>
+
+    <a href="/catalog/table" class="category-card" data-category="table">
+      <div class="category-image">
+        <div class="category-placeholder">
+          <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="15" y="20" width="90" height="8" rx="3" stroke="currentColor" stroke-width="2"/>
+            <line x1="25" y1="28" x2="25" y2="70" stroke="currentColor" stroke-width="2"/>
+            <line x1="95" y1="28" x2="95" y2="70" stroke="currentColor" stroke-width="2"/>
+            <ellipse cx="60" cy="15" rx="20" ry="8" stroke="#e8772e" stroke-width="1.5" opacity="0.7"/>
+            <path d="M50 10 Q55 2 60 5 Q65 0 70 8" stroke="#ff9a44" stroke-width="1" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="category-overlay"></div>
+      </div>
+      <div class="category-info">
+        <h2 class="category-name">Столы</h2>
+        <p class="category-desc">Круглые столы с встроенной костровой зоной для уютных вечеров на свежем воздухе</p>
+        <span class="category-count" data-cat="table"></span>
+        <span class="category-arrow">&rarr;</span>
+      </div>
+    </a>
+
+    <a href="/catalog/oven" class="category-card" data-category="oven">
+      <div class="category-image">
+        <div class="category-placeholder">
+          <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="25" y="15" width="70" height="55" rx="5" stroke="currentColor" stroke-width="2"/>
+            <rect x="35" y="25" width="50" height="25" rx="3" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="25" y1="10" x2="35" y2="10" stroke="currentColor" stroke-width="2"/>
+            <line x1="85" y1="10" x2="95" y2="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M50 35 Q55 25 60 30 Q65 22 70 32" stroke="#e8772e" stroke-width="1.5" opacity="0.7"/>
+          </svg>
+        </div>
+        <div class="category-overlay"></div>
+      </div>
+      <div class="category-info">
+        <h2 class="category-name">Печи</h2>
+        <p class="category-desc">Печи для казана и барбекю с дымоходом, идеальны для приготовления на открытом огне</p>
+        <span class="category-count" data-cat="oven"></span>
+        <span class="category-arrow">&rarr;</span>
+      </div>
+    </a>
+  </section>
+</main>
+
+<!-- CATALOG: Products by Category View -->
+<main id="productsView" class="catalog-page" style="display:none">
+  <div class="products-header">
+    <nav class="breadcrumbs">
+      <a href="/catalog">Каталог</a>
+      <span class="breadcrumb-sep">/</span>
+      <span id="breadcrumbCategory"></span>
+    </nav>
+    <h1 class="products-title" id="productsTitle"></h1>
+    <p class="products-subtitle" id="productsSubtitle"></p>
+  </div>
+
+  <section class="products-grid" id="productsGrid">
+    <!-- Rendered by JS -->
+  </section>
+
+  <div class="products-back">
+    <a href="/catalog" class="btn-back">&larr; Все категории</a>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="logo">ОЧАГИ<span>&amp;КАМИНЫ</span></a>
+      <span class="footer-tagline">Уют начинается с огня</span>
+    </div>
+
+    <div class="footer-social">
+      <span class="footer-social-title">Мы в соцсетях</span>
+      <div class="footer-social-links">
+        <a href="https://www.instagram.com/ochagi_kaminy.kz" target="_blank" rel="noopener" class="footer-social-link" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://www.tiktok.com/@ochagi_kaminy.kz" target="_blank" rel="noopener" class="footer-social-link" aria-label="TikTok">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.73a8.19 8.19 0 004.76 1.52V6.8a4.84 4.84 0 01-1-.11z"/></svg>
+        </a>
+        <a href="https://wa.me/77763857050" target="_blank" rel="noopener" class="footer-social-link" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-contacts">
+      <a href="tel:+77763857050" class="footer-phone">+7 776 385 7050</a>
+      <a href="mailto:info@ochagi-kaminy.kz">info@ochagi-kaminy.kz</a>
+      <a href="https://ochagi-kaminy.kz">ochagi-kaminy.kz</a>
+    </div>
+  </div>
+  <div class="footer-copy">
+    <span>&copy; 2025 Очаги и Камины KZ</span>
+    <span>Казахстан</span>
+  </div>
+</footer>
+
+<script>
+(function() {
+  // Mobile menu
+  const burger = document.getElementById('burger');
+  const nav = document.getElementById('nav');
+  burger.addEventListener('click', () => {
+    const isOpen = nav.classList.toggle('open');
+    burger.setAttribute('aria-expanded', isOpen);
+  });
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    nav.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
+  }));
+
+  // Category metadata
+  const CATEGORIES = {
+    bowl: { name: 'Костровые чаши', desc: 'Классические и усовершенствованные костровые чаши из холоднокатаной стали с жаропрочным покрытием до 600°C' },
+    table: { name: 'Столы', desc: 'Круглые столы с встроенной костровой зоной для уютных вечеров на свежем воздухе' },
+    oven: { name: 'Печи', desc: 'Печи для казана и барбекю с дымоходом, идеальны для приготовления на открытом огне' }
+  };
+
+  const path = window.location.pathname;
+  const categoryMatch = path.match(/^\/catalog\/(\w+)$/);
+
+  if (categoryMatch && CATEGORIES[categoryMatch[1]]) {
+    showProducts(categoryMatch[1]);
+  } else {
+    showCategories();
+  }
+
+  async function showCategories() {
+    document.getElementById('catalogView').style.display = '';
+    document.getElementById('productsView').style.display = 'none';
+
+    try {
+      const res = await fetch('/api/products');
+      const products = await res.json();
+      const counts = {};
+      products.forEach(p => { counts[p.category] = (counts[p.category] || 0) + 1; });
+
+      document.querySelectorAll('.category-count').forEach(el => {
+        const cat = el.dataset.cat;
+        const n = counts[cat] || 0;
+        el.textContent = n + ' ' + pluralize(n, 'товар', 'товара', 'товаров');
+      });
+    } catch(e) { console.error(e); }
+
+    // Staggered entrance animation
+    document.querySelectorAll('.category-card').forEach((card, i) => {
+      card.style.animationDelay = (i * 0.15) + 's';
+    });
+  }
+
+  async function showProducts(category) {
+    document.getElementById('catalogView').style.display = 'none';
+    document.getElementById('productsView').style.display = '';
+
+    const cat = CATEGORIES[category];
+    document.getElementById('breadcrumbCategory').textContent = cat.name;
+    document.getElementById('productsTitle').textContent = cat.name;
+    document.getElementById('productsSubtitle').textContent = cat.desc;
+    document.title = cat.name + ' — Очаги и Камины KZ';
+
+    try {
+      const res = await fetch('/api/products?category=' + category);
+      const products = await res.json();
+      renderProducts(products);
+    } catch(e) {
+      document.getElementById('productsGrid').innerHTML = '<p style="color:var(--text-secondary)">Ошибка загрузки товаров</p>';
+    }
+  }
+
+  function renderProducts(products) {
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = products.map((p, i) => {
+      const specsHtml = p.specs.map(s =>
+        '<div class="p-spec"><span class="p-spec-label">' + esc(s.label) + ':</span> <span class="p-spec-value">' + esc(s.value) + '</span></div>'
+      ).join('');
+
+      const optionsHtml = p.options.length ? '<details class="p-options"><summary>Дополнительные опции (' + p.options.length + ')</summary><ul>' +
+        p.options.map(o => '<li><span>' + esc(o.name) + '</span><span>' + formatPrice(o.price) + ' ₸</span></li>').join('') +
+        '</ul></details>' : '';
+
+      const imageHtml = p.image_url
+        ? '<img src="' + esc(p.image_url) + '" alt="' + esc(p.name) + '" loading="lazy">'
+        : '<div class="p-img-placeholder"><svg viewBox="0 0 80 60" fill="none"><path d="M25 40 Q35 15 40 20 Q50 5 55 25 Q60 10 65 30" stroke="#e8772e" stroke-width="1.5" opacity="0.6"/><ellipse cx="40" cy="45" rx="25" ry="8" stroke="currentColor" stroke-width="1.5" opacity="0.3"/></svg></div>';
+
+      const waText = encodeURIComponent('Здравствуйте! Интересует: ' + p.name + ' (' + formatPrice(p.price) + ' ₸)');
+
+      return '<article class="product-card" style="animation-delay:' + (i * 0.1) + 's">' +
+        '<div class="p-image">' + imageHtml + '</div>' +
+        '<div class="p-body">' +
+          '<span class="p-badge p-badge-' + esc(p.category) + '">' + esc(p.badge) + '</span>' +
+          '<h3 class="p-name">' + esc(p.name) + '</h3>' +
+          '<div class="p-specs">' + specsHtml + '</div>' +
+          optionsHtml +
+          '<div class="p-footer">' +
+            '<div class="p-price">' + formatPrice(p.price) + ' <small>₸</small></div>' +
+            '<a href="https://wa.me/77763857050?text=' + waText + '" target="_blank" rel="noopener" class="p-order-btn">Заказать</a>' +
+          '</div>' +
+        '</div>' +
+      '</article>';
+    }).join('');
+  }
+
+  function formatPrice(n) {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+
+  function pluralize(n, one, few, many) {
+    const mod10 = n % 10, mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return one;
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+    return many;
+  }
+
+  function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+})();
+</script>
+</body>
+</html>
