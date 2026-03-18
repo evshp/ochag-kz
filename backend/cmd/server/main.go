@@ -38,16 +38,19 @@ func main() {
 	productRepo := postgres.NewProductRepo(pool)
 	userRepo := postgres.NewUserRepo(pool)
 	contactRepo := postgres.NewContactRepo(pool)
+	inventoryRepo := postgres.NewInventoryRepo(pool)
 
 	// Services
 	productSvc := service.NewProductService(productRepo)
 	authSvc := service.NewAuthService(userRepo, cfg.JWTSecret)
 	contactSvc := service.NewContactService(contactRepo)
+	inventorySvc := service.NewInventoryService(inventoryRepo)
 
 	// Handlers
-	productHandler := handler.NewProductHandler(productSvc)
+	productHandler := handler.NewProductHandler(productSvc, inventorySvc)
 	authHandler := handler.NewAuthHandler(authSvc)
 	contactHandler := handler.NewContactHandler(contactSvc)
+	inventoryHandler := handler.NewInventoryHandler(inventorySvc, productSvc)
 
 	// Router
 	r := chi.NewRouter()
@@ -72,6 +75,14 @@ func main() {
 				r.Post("/", productHandler.Create)
 				r.Put("/{id}", productHandler.Update)
 				r.Delete("/{id}", productHandler.Delete)
+			})
+
+			// Inventory — manager and admin
+			r.Route("/inventory", func(r chi.Router) {
+				r.Use(middleware.RequireRole("admin", "manager"))
+				r.Get("/", inventoryHandler.GetAll)
+				r.Put("/{productID}", inventoryHandler.AdjustStock)
+				r.Get("/{productID}/logs", inventoryHandler.GetLogs)
 			})
 
 			// Users — admin only for create/delete/role, all authenticated for list

@@ -11,12 +11,13 @@ type ProductOption struct {
 }
 
 type Product struct {
-	ID       int64
-	Name     string
-	Category string // bowl, table, oven
-	Badge    string
-	Price    int
-	ImageURL string
-	Specs    []Spec
-	Options  []ProductOption
+	ID            int64
+	Name          string
+	Category      string // bowl, table, oven
+	Badge         string
+	Price         int
+	ImageURL      string
+	StockQuantity int
+	Specs         []Spec
+	Options       []ProductOption
 }
