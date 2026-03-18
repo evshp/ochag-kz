@@ -4,7 +4,24 @@
   let currentUser = null;
   let editingProductId = null;
 
-  const categoryLabels = { bowl: 'Костровая чаша', table: 'Костровой стол', oven: 'Печь' };
+  // Restore session from localStorage
+  (function restoreSession() {
+    try {
+      const saved = localStorage.getItem('adminToken');
+      if (!saved) return;
+      const payload = JSON.parse(atob(saved.split('.')[1]));
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        localStorage.removeItem('adminToken');
+        return;
+      }
+      adminToken = saved;
+      currentUser = { id: payload.user_id, username: payload.username, role: payload.role };
+    } catch(e) {
+      localStorage.removeItem('adminToken');
+    }
+  })();
+
+  const categoryLabels = { bowl: 'Костровая чаша', table: 'Костровой стол', oven: 'Печь', accessory: 'Аксессуар' };
 
   async function apiFetch(url, options = {}) {
     const headers = { 'Content-Type': 'application/json', ...options.headers };
@@ -13,6 +30,7 @@
     if (res.status === 401) {
       adminToken = null;
       currentUser = null;
+      localStorage.removeItem('adminToken');
       showLogin();
       throw new Error('Сессия истекла');
     }
@@ -159,6 +177,7 @@
 
       const data = await res.json();
       adminToken = data.token;
+      localStorage.setItem('adminToken', adminToken);
 
       const payload = JSON.parse(atob(adminToken.split('.')[1]));
       currentUser = { id: payload.user_id, username: payload.username, role: payload.role };
@@ -182,6 +201,7 @@
   window.adminLogout = function() {
     adminToken = null;
     currentUser = null;
+    localStorage.removeItem('adminToken');
     showLogin();
   };
 
@@ -253,73 +273,264 @@
     }
   };
 
-  // ===== PRODUCTS =====
+  // ===== PRODUCTS (redesigned with search, filters, cards) =====
+  let allAdminProducts = [];
+  let activeProductFilter = 'all';
+
   async function loadAdminProducts() {
     try {
       const res = await fetch('/api/products');
       if (!res.ok) throw new Error('Failed to load products');
-      const products = await res.json();
-      renderAdminProducts(products);
+      allAdminProducts = await res.json();
+      filterProducts();
     } catch(e) {
       console.error('Load products error:', e);
     }
   }
 
+  window.filterProducts = function() {
+    const query = (document.getElementById('productSearch').value || '').toLowerCase().trim();
+    const sort = document.getElementById('productSort').value;
+
+    let filtered = allAdminProducts.filter(p => {
+      const matchesFilter = activeProductFilter === 'all' || p.category === activeProductFilter;
+      const matchesSearch = !query || p.name.toLowerCase().includes(query) ||
+        (p.description || '').toLowerCase().includes(query) ||
+        (categoryLabels[p.category] || '').toLowerCase().includes(query);
+      return matchesFilter && matchesSearch;
+    });
+
+    // Sort
+    filtered.sort((a, b) => {
+      if (sort === 'name') return a.name.localeCompare(b.name, 'ru');
+      if (sort === 'price-asc') return a.price - b.price;
+      if (sort === 'price-desc') return b.price - a.price;
+      if (sort === 'category') return (a.category || '').localeCompare(b.category || '');
+      return 0;
+    });
+
+    // Update count
+    const countEl = document.getElementById('productSearchCount');
+    if (query || activeProductFilter !== 'all') {
+      countEl.textContent = filtered.length + ' из ' + allAdminProducts.length;
+    } else {
+      countEl.textContent = '';
+    }
+
+    renderAdminProducts(filtered);
+  };
+
+  window.setProductFilter = function(filter) {
+    activeProductFilter = filter;
+    document.querySelectorAll('#productFilters .ap-chip').forEach(btn => {
+      btn.classList.toggle('ap-chip--active', btn.dataset.filter === filter);
+    });
+    filterProducts();
+  };
+
   function renderAdminProducts(products) {
-    const tbody = document.getElementById('adminProductsBody');
+    const grid = document.getElementById('adminProductsGrid');
+    const emptyEl = document.getElementById('adminProductsEmpty');
     const canManage = currentUser && (currentUser.role === 'admin' || currentUser.role === 'manager');
-    tbody.innerHTML = '';
 
-    products.forEach(p => {
-      const tr = document.createElement('tr');
+    if (products.length === 0) {
+      grid.style.display = 'none';
+      emptyEl.style.display = 'block';
+      return;
+    }
+    grid.style.display = '';
+    emptyEl.style.display = 'none';
+    grid.innerHTML = '';
 
-      const tdId = document.createElement('td');
-      tdId.textContent = p.id;
+    products.forEach((p, i) => {
+      const card = document.createElement('div');
+      card.className = 'ap-card';
+      card.style.animationDelay = (i * 0.04) + 's';
 
-      const tdName = document.createElement('td');
-      tdName.textContent = p.name;
+      const catLabel = categoryLabels[p.category] || p.category;
+      const priceStr = p.price.toLocaleString('ru-RU') + ' \u20B8';
+      const recCount = (p.recommendations || []).length;
 
-      const tdCat = document.createElement('td');
-      tdCat.textContent = categoryLabels[p.category] || p.category;
-
-      const tdPrice = document.createElement('td');
-      tdPrice.textContent = p.price.toLocaleString('ru-RU') + ' \u20B8';
-
-      const tdBadge = document.createElement('td');
-      tdBadge.textContent = p.badge || '\u2014';
-
-      const tdActions = document.createElement('td');
-      if (canManage) {
-        const btnEdit = document.createElement('button');
-        btnEdit.className = 'admin-action-btn btn-edit';
-        btnEdit.textContent = 'Изменить';
-        btnEdit.addEventListener('click', () => startEditProduct(p));
-        tdActions.appendChild(btnEdit);
-
-        const btnDel = document.createElement('button');
-        btnDel.className = 'admin-action-btn btn-delete';
-        btnDel.textContent = 'Удалить';
-        btnDel.addEventListener('click', () => deleteProduct(p.id, p.name));
-        tdActions.appendChild(btnDel);
+      // Image
+      let imgHtml;
+      if (p.image_url) {
+        imgHtml = '<img class="ap-card-img" src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="ap-card-img--placeholder" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>';
       } else {
-        tdActions.textContent = '\u2014';
+        imgHtml = '<div class="ap-card-img--placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>';
       }
 
-      tr.append(tdId, tdName, tdCat, tdPrice, tdBadge, tdActions);
-      tbody.appendChild(tr);
+      let badgeHtml = p.badge ? '<span class="ap-card-badge">' + p.badge + '</span>' : '';
+      let descHtml = p.description ? '<div class="ap-card-desc">' + p.description + '</div>' : '';
+
+      // Show specs inline on card
+      const specsCount = (p.specs || []).length;
+      const optionsCount = (p.options || []).length;
+      let specsHtml = '';
+      if (specsCount > 0) {
+        specsHtml = '<div class="ap-card-specs">';
+        (p.specs || []).slice(0, 3).forEach(s => {
+          specsHtml += '<span class="ap-card-spec">' + s.label + ': <strong>' + s.value + '</strong></span>';
+        });
+        if (specsCount > 3) specsHtml += '<span class="ap-card-spec ap-card-spec--more">+' + (specsCount - 3) + '</span>';
+        specsHtml += '</div>';
+      }
+
+      let actionsHtml = '';
+      if (canManage) {
+        actionsHtml = '<div class="ap-card-actions">' +
+          '<button class="ap-card-action ap-card-action--edit" data-action="edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Изменить</button>' +
+          '<button class="ap-card-action ap-card-action--rec" data-action="rec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Рекоменд.' +
+          (recCount > 0 ? ' <span class="ap-card-rec-count"><strong>' + recCount + '</strong></span>' : '') +
+          '</button>' +
+          '<button class="ap-card-action ap-card-action--del" data-action="del"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Удалить</button>' +
+        '</div>';
+      }
+
+      card.innerHTML = imgHtml +
+        '<div class="ap-card-body">' +
+          '<div class="ap-card-cat">' + catLabel + '</div>' +
+          '<div class="ap-card-name">' + p.name + '</div>' +
+          descHtml +
+          specsHtml +
+          '<div class="ap-card-meta">' +
+            '<span class="ap-card-price">' + priceStr + '</span>' +
+            badgeHtml +
+          '</div>' +
+          (optionsCount > 0 ? '<div class="ap-card-opts-info">' + optionsCount + ' опци' + (optionsCount === 1 ? 'я' : optionsCount < 5 ? 'и' : 'й') + '</div>' : '') +
+        '</div>' +
+        actionsHtml;
+
+      // Event delegation for card actions
+      card.addEventListener('click', function(e) {
+        const actionBtn = e.target.closest('[data-action]');
+        if (!actionBtn) return;
+        const action = actionBtn.dataset.action;
+        if (action === 'edit') startEditProduct(p);
+        else if (action === 'rec') openRecommendations(p.id, p.name);
+        else if (action === 'del') deleteProduct(p.id, p.name);
+      });
+
+      grid.appendChild(card);
     });
+  }
+
+  // Collapsible product form
+  window.toggleProductForm = function() {
+    const panel = document.getElementById('productFormSection');
+    panel.classList.toggle('ap-form--open');
+  };
+
+  // ===== DYNAMIC SPEC ROWS =====
+  window.addSpecRow = function(label, value) {
+    const container = document.getElementById('specsContainer');
+    const row = document.createElement('div');
+    row.className = 'ap-dynrow';
+
+    const labelInput = document.createElement('input');
+    labelInput.type = 'text';
+    labelInput.className = 'ap-input';
+    labelInput.placeholder = 'Название (напр. Размер, Сталь, Вес)';
+    labelInput.value = label || '';
+
+    const valueInput = document.createElement('input');
+    valueInput.type = 'text';
+    valueInput.className = 'ap-input';
+    valueInput.placeholder = 'Значение (напр. 1200×900 мм)';
+    valueInput.value = value || '';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'ap-dynrow-remove';
+    removeBtn.innerHTML = '&times;';
+    removeBtn.addEventListener('click', function() { row.remove(); });
+
+    row.append(labelInput, valueInput, removeBtn);
+    container.appendChild(row);
+  };
+
+  function getSpecsFromForm() {
+    const rows = document.querySelectorAll('#specsContainer .ap-dynrow');
+    const specs = [];
+    rows.forEach(row => {
+      const inputs = row.querySelectorAll('.ap-input');
+      const label = inputs[0].value.trim();
+      const value = inputs[1].value.trim();
+      if (label && value) specs.push({ label, value });
+    });
+    return specs;
+  }
+
+  // ===== DYNAMIC OPTION ROWS =====
+  window.addOptionRow = function(name, price) {
+    const container = document.getElementById('optionsContainer');
+    const row = document.createElement('div');
+    row.className = 'ap-dynrow';
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.className = 'ap-input';
+    nameInput.placeholder = 'Название опции (напр. Чехол)';
+    nameInput.value = name || '';
+
+    const priceInput = document.createElement('input');
+    priceInput.type = 'number';
+    priceInput.className = 'ap-input ap-input--price';
+    priceInput.placeholder = 'Цена (тг)';
+    priceInput.min = '0';
+    priceInput.value = price || '';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'ap-dynrow-remove';
+    removeBtn.innerHTML = '&times;';
+    removeBtn.addEventListener('click', function() { row.remove(); });
+
+    row.append(nameInput, priceInput, removeBtn);
+    container.appendChild(row);
+  };
+
+  function getOptionsFromForm() {
+    const rows = document.querySelectorAll('#optionsContainer .ap-dynrow');
+    const options = [];
+    rows.forEach(row => {
+      const nameInput = row.querySelector('.ap-input');
+      const priceInput = row.querySelector('.ap-input--price');
+      const name = nameInput.value.trim();
+      const price = parseInt(priceInput.value, 10);
+      if (name && price > 0) options.push({ name, price });
+    });
+    return options;
+  }
+
+  function clearDynRows() {
+    document.getElementById('specsContainer').innerHTML = '';
+    document.getElementById('optionsContainer').innerHTML = '';
   }
 
   function startEditProduct(p) {
     editingProductId = p.id;
-    document.getElementById('productFormTitle').textContent = 'Редактировать товар #' + p.id;
+    // Open form if closed
+    const panel = document.getElementById('productFormSection');
+    if (!panel.classList.contains('ap-form--open')) panel.classList.add('ap-form--open');
+
+    document.getElementById('productFormTitle').textContent = 'Редактировать: ' + p.name;
     document.getElementById('productName').value = p.name;
     document.getElementById('productCategory').value = p.category;
     document.getElementById('productPrice').value = p.price;
     document.getElementById('productBadge').value = p.badge || '';
+    document.getElementById('productDescription').value = p.description || '';
     document.getElementById('productImageUrl').value = p.image_url || '';
     document.getElementById('productSubmitBtn').textContent = 'Сохранить';
     document.getElementById('productCancelBtn').style.display = 'inline-block';
+
+    // Populate specs
+    clearDynRows();
+    (p.specs || []).forEach(s => addSpecRow(s.label, s.value));
+    // Populate options
+    (p.options || []).forEach(o => addOptionRow(o.name, o.price));
+
+    // Scroll form into view
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   window.cancelEditProduct = function() {
@@ -329,9 +540,11 @@
     document.getElementById('productCategory').value = 'bowl';
     document.getElementById('productPrice').value = '';
     document.getElementById('productBadge').value = '';
+    document.getElementById('productDescription').value = '';
     document.getElementById('productImageUrl').value = '';
     document.getElementById('productSubmitBtn').textContent = 'Добавить';
     document.getElementById('productCancelBtn').style.display = 'none';
+    clearDynRows();
   };
 
   window.submitProduct = async function() {
@@ -339,12 +552,15 @@
     const category = document.getElementById('productCategory').value;
     const price = parseInt(document.getElementById('productPrice').value, 10);
     const badge = document.getElementById('productBadge').value.trim();
+    const description = document.getElementById('productDescription').value.trim();
     const image_url = document.getElementById('productImageUrl').value.trim();
+    const specs = getSpecsFromForm();
+    const options = getOptionsFromForm();
 
     if (!name) { alert('Введите название товара'); return; }
     if (!price || price <= 0) { alert('Введите корректную цену'); return; }
 
-    const body = { name, category, price, badge, image_url, specs: [], options: [] };
+    const body = { name, description, category, price, badge, image_url, specs, options };
 
     try {
       let res;
@@ -572,6 +788,192 @@
     html += '</div>';
     container.innerHTML = html;
   }
+
+  // ===== RECOMMENDATIONS (redesigned with search & filters) =====
+  let allProductsCache = [];
+  let recSelectedIds = new Set();
+  let activeRecFilter = 'all';
+
+  async function openRecommendations(productId, productName) {
+    // Load all products for selection
+    try {
+      const res = await fetch('/api/products');
+      if (!res.ok) throw new Error('err');
+      allProductsCache = await res.json();
+    } catch(e) {
+      alert('Ошибка загрузки товаров');
+      return;
+    }
+
+    // Load current recommendations
+    recSelectedIds = new Set();
+    try {
+      const res = await apiFetch('/api/admin/products/' + productId + '/recommendations');
+      if (res.ok) {
+        const data = await res.json();
+        (data.product_ids || []).forEach(id => recSelectedIds.add(id));
+      }
+    } catch(e) { /* ignore */ }
+
+    const modal = document.getElementById('recModal');
+    document.getElementById('recModalTitle').textContent = 'Рекомендации: ' + productName;
+    modal.dataset.productId = productId;
+
+    // Reset search and filter
+    document.getElementById('recSearch').value = '';
+    activeRecFilter = 'all';
+    document.querySelectorAll('#recChips .ap-chip').forEach(btn => {
+      btn.classList.toggle('ap-chip--active', btn.dataset.recFilter === 'all');
+    });
+
+    renderRecProducts(productId);
+    renderRecSelectedPills();
+    modal.classList.add('active');
+
+    // Focus search
+    setTimeout(() => document.getElementById('recSearch').focus(), 100);
+  }
+
+  function renderRecProducts(productId) {
+    productId = productId || parseInt(document.getElementById('recModal').dataset.productId, 10);
+    const query = (document.getElementById('recSearch').value || '').toLowerCase().trim();
+    const list = document.getElementById('recProductList');
+    list.innerHTML = '';
+
+    const filtered = allProductsCache.filter(p => {
+      if (p.id === productId) return false;
+      const matchFilter = activeRecFilter === 'all' || p.category === activeRecFilter;
+      const matchSearch = !query || p.name.toLowerCase().includes(query) ||
+        (categoryLabels[p.category] || '').toLowerCase().includes(query);
+      return matchFilter && matchSearch;
+    });
+
+    if (filtered.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--text-secondary);font-size:0.8rem;">Ничего не найдено</div>';
+      return;
+    }
+
+    // Sort: selected first, then by name
+    filtered.sort((a, b) => {
+      const aSelected = recSelectedIds.has(a.id) ? 0 : 1;
+      const bSelected = recSelectedIds.has(b.id) ? 0 : 1;
+      if (aSelected !== bSelected) return aSelected - bSelected;
+      return a.name.localeCompare(b.name, 'ru');
+    });
+
+    filtered.forEach(p => {
+      const item = document.createElement('label');
+      item.className = 'rec-item' + (recSelectedIds.has(p.id) ? ' rec-item--checked' : '');
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = p.id;
+      cb.checked = recSelectedIds.has(p.id);
+      cb.addEventListener('change', function() {
+        if (this.checked) {
+          if (recSelectedIds.size >= 10) {
+            this.checked = false;
+            alert('Максимум 10 рекомендаций');
+            return;
+          }
+          recSelectedIds.add(p.id);
+          item.classList.add('rec-item--checked');
+        } else {
+          recSelectedIds.delete(p.id);
+          item.classList.remove('rec-item--checked');
+        }
+        renderRecSelectedPills();
+      });
+
+      const info = document.createElement('div');
+      info.className = 'rec-item-info';
+
+      const nameSpan = document.createElement('div');
+      nameSpan.className = 'rec-item-name';
+      nameSpan.textContent = p.name;
+
+      const detail = document.createElement('div');
+      detail.className = 'rec-item-detail';
+      detail.textContent = categoryLabels[p.category] || p.category;
+
+      info.append(nameSpan, detail);
+
+      const price = document.createElement('span');
+      price.className = 'rec-item-price';
+      price.textContent = p.price.toLocaleString('ru-RU') + ' \u20B8';
+
+      item.append(cb, info, price);
+      list.appendChild(item);
+    });
+  }
+
+  function renderRecSelectedPills() {
+    const container = document.getElementById('recSelectedList');
+    const countEl = document.getElementById('recSelectedCount');
+    countEl.textContent = recSelectedIds.size;
+    container.innerHTML = '';
+
+    recSelectedIds.forEach(id => {
+      const product = allProductsCache.find(p => p.id === id);
+      if (!product) return;
+
+      const pill = document.createElement('span');
+      pill.className = 'rec-pill';
+
+      const text = document.createTextNode(product.name);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'rec-pill-remove';
+      removeBtn.innerHTML = '&times;';
+      removeBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        recSelectedIds.delete(id);
+        renderRecSelectedPills();
+        renderRecProducts();
+      });
+
+      pill.append(text, removeBtn);
+      container.appendChild(pill);
+    });
+  }
+
+  window.filterRecProducts = function() {
+    renderRecProducts();
+  };
+
+  window.setRecFilter = function(filter) {
+    activeRecFilter = filter;
+    document.querySelectorAll('#recChips .ap-chip').forEach(btn => {
+      btn.classList.toggle('ap-chip--active', btn.dataset.recFilter === filter);
+    });
+    renderRecProducts();
+  };
+
+  window.closeRecModal = function() {
+    document.getElementById('recModal').classList.remove('active');
+  };
+
+  window.saveRecommendations = async function() {
+    const modal = document.getElementById('recModal');
+    const productId = parseInt(modal.dataset.productId, 10);
+    const ids = Array.from(recSelectedIds);
+
+    try {
+      const res = await apiFetch('/api/admin/products/' + productId + '/recommendations', {
+        method: 'PUT',
+        body: JSON.stringify({ product_ids: ids })
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || 'Ошибка сохранения рекомендаций');
+        return;
+      }
+      closeRecModal();
+      loadAdminProducts();
+    } catch(e) {
+      alert('Ошибка подключения к серверу');
+    }
+  };
 
   // Auto-open admin panel on /admin URL
   if (window.location.pathname === '/admin') {

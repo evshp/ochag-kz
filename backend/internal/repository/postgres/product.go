@@ -19,7 +19,7 @@ func NewProductRepo(pool *pgxpool.Pool) *ProductRepo {
 
 func (r *ProductRepo) GetAll(ctx context.Context) ([]model.Product, error) {
 	rows, err := r.pool.Query(ctx,
-		"SELECT p.id, p.name, p.category, p.badge, p.price, p.image_url, COALESCE(i.quantity, 0) FROM products p LEFT JOIN inventory i ON i.product_id = p.id ORDER BY p.id")
+		"SELECT p.id, p.name, p.description, p.category, p.badge, p.price, p.image_url, COALESCE(i.quantity, 0) FROM products p LEFT JOIN inventory i ON i.product_id = p.id ORDER BY p.id")
 	if err != nil {
 		return nil, fmt.Errorf("query products: %w", err)
 	}
@@ -28,7 +28,7 @@ func (r *ProductRepo) GetAll(ctx context.Context) ([]model.Product, error) {
 	var products []model.Product
 	for rows.Next() {
 		var p model.Product
-		if err := rows.Scan(&p.ID, &p.Name, &p.Category, &p.Badge, &p.Price, &p.ImageURL, &p.StockQuantity); err != nil {
+		if err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.Category, &p.Badge, &p.Price, &p.ImageURL, &p.StockQuantity); err != nil {
 			return nil, fmt.Errorf("scan product: %w", err)
 		}
 		products = append(products, p)
@@ -43,7 +43,7 @@ func (r *ProductRepo) GetAll(ctx context.Context) ([]model.Product, error) {
 
 func (r *ProductRepo) GetByCategory(ctx context.Context, category string) ([]model.Product, error) {
 	rows, err := r.pool.Query(ctx,
-		"SELECT p.id, p.name, p.category, p.badge, p.price, p.image_url, COALESCE(i.quantity, 0) FROM products p LEFT JOIN inventory i ON i.product_id = p.id WHERE p.category = $1 ORDER BY p.id", category)
+		"SELECT p.id, p.name, p.description, p.category, p.badge, p.price, p.image_url, COALESCE(i.quantity, 0) FROM products p LEFT JOIN inventory i ON i.product_id = p.id WHERE p.category = $1 ORDER BY p.id", category)
 	if err != nil {
 		return nil, fmt.Errorf("query products by category: %w", err)
 	}
@@ -52,7 +52,7 @@ func (r *ProductRepo) GetByCategory(ctx context.Context, category string) ([]mod
 	var products []model.Product
 	for rows.Next() {
 		var p model.Product
-		if err := rows.Scan(&p.ID, &p.Name, &p.Category, &p.Badge, &p.Price, &p.ImageURL, &p.StockQuantity); err != nil {
+		if err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.Category, &p.Badge, &p.Price, &p.ImageURL, &p.StockQuantity); err != nil {
 			return nil, fmt.Errorf("scan product: %w", err)
 		}
 		products = append(products, p)
@@ -68,8 +68,8 @@ func (r *ProductRepo) GetByCategory(ctx context.Context, category string) ([]mod
 func (r *ProductRepo) GetByID(ctx context.Context, id int64) (*model.Product, error) {
 	var p model.Product
 	err := r.pool.QueryRow(ctx,
-		"SELECT p.id, p.name, p.category, p.badge, p.price, p.image_url, COALESCE(i.quantity, 0) FROM products p LEFT JOIN inventory i ON i.product_id = p.id WHERE p.id = $1", id).
-		Scan(&p.ID, &p.Name, &p.Category, &p.Badge, &p.Price, &p.ImageURL, &p.StockQuantity)
+		"SELECT p.id, p.name, p.description, p.category, p.badge, p.price, p.image_url, COALESCE(i.quantity, 0) FROM products p LEFT JOIN inventory i ON i.product_id = p.id WHERE p.id = $1", id).
+		Scan(&p.ID, &p.Name, &p.Description, &p.Category, &p.Badge, &p.Price, &p.ImageURL, &p.StockQuantity)
 	if err != nil {
 		return nil, fmt.Errorf("query product by id: %w", err)
 	}
@@ -91,8 +91,8 @@ func (r *ProductRepo) Create(ctx context.Context, product *model.Product) (int64
 
 	var id int64
 	err = tx.QueryRow(ctx,
-		"INSERT INTO products (name, category, badge, price, image_url) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-		product.Name, product.Category, product.Badge, product.Price, product.ImageURL,
+		"INSERT INTO products (name, description, category, badge, price, image_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+		product.Name, product.Description, product.Category, product.Badge, product.Price, product.ImageURL,
 	).Scan(&id)
 	if err != nil {
 		return 0, fmt.Errorf("insert product: %w", err)
@@ -133,8 +133,8 @@ func (r *ProductRepo) Update(ctx context.Context, product *model.Product) error 
 	defer tx.Rollback(ctx)
 
 	_, err = tx.Exec(ctx,
-		"UPDATE products SET name = $1, category = $2, badge = $3, price = $4, image_url = $5 WHERE id = $6",
-		product.Name, product.Category, product.Badge, product.Price, product.ImageURL, product.ID,
+		"UPDATE products SET name = $1, description = $2, category = $3, badge = $4, price = $5, image_url = $6 WHERE id = $7",
+		product.Name, product.Description, product.Category, product.Badge, product.Price, product.ImageURL, product.ID,
 	)
 	if err != nil {
 		return fmt.Errorf("update product: %w", err)

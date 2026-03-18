@@ -96,6 +96,32 @@
         <span class="category-arrow">&rarr;</span>
       </div>
     </a>
+
+    <a href="/catalog/accessory" class="category-card" data-category="accessory">
+      <div class="category-image">
+        <div class="category-placeholder">
+          <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="30" y="35" width="60" height="6" rx="3" stroke="currentColor" stroke-width="2"/>
+            <line x1="38" y1="35" x2="38" y2="18" stroke="currentColor" stroke-width="2"/>
+            <line x1="82" y1="35" x2="82" y2="18" stroke="currentColor" stroke-width="2"/>
+            <line x1="38" y1="18" x2="82" y2="18" stroke="currentColor" stroke-width="2"/>
+            <line x1="48" y1="18" x2="48" y2="12" stroke="#e8772e" stroke-width="1.5" opacity="0.7"/>
+            <line x1="60" y1="18" x2="60" y2="10" stroke="#e8772e" stroke-width="1.5" opacity="0.7"/>
+            <line x1="72" y1="18" x2="72" y2="12" stroke="#e8772e" stroke-width="1.5" opacity="0.7"/>
+            <path d="M25 55 L45 55 L45 65 L25 65 Z" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
+            <path d="M55 55 L95 55" stroke="currentColor" stroke-width="2" opacity="0.5"/>
+            <circle cx="55" cy="55" r="3" stroke="#e8772e" stroke-width="1.5" opacity="0.7"/>
+          </svg>
+        </div>
+        <div class="category-overlay"></div>
+      </div>
+      <div class="category-info">
+        <h2 class="category-name">Аксессуары</h2>
+        <p class="category-desc">Решётки, крышки, кочерги и другие аксессуары для костровых чаш, столов и печей</p>
+        <span class="category-count" data-cat="accessory"></span>
+        <span class="category-arrow">&rarr;</span>
+      </div>
+    </a>
   </section>
 </main>
 
@@ -119,6 +145,11 @@
     <a href="/catalog" class="btn-back">&larr; Все категории</a>
   </div>
 </main>
+
+<!-- Product Detail Modal -->
+<div id="productDetailModal" class="pd-modal">
+  <div class="pd-modal-content" id="pdModalContent"></div>
+</div>
 
 <!-- FOOTER -->
 <footer>
@@ -173,8 +204,11 @@
   const CATEGORIES = {
     bowl: { name: 'Костровые чаши', desc: 'Классические и усовершенствованные костровые чаши из холоднокатаной стали с жаропрочным покрытием до 600°C' },
     table: { name: 'Столы', desc: 'Круглые столы с встроенной костровой зоной для уютных вечеров на свежем воздухе' },
-    oven: { name: 'Печи', desc: 'Печи для казана и барбекю с дымоходом, идеальны для приготовления на открытом огне' }
+    oven: { name: 'Печи', desc: 'Печи для казана и барбекю с дымоходом, идеальны для приготовления на открытом огне' },
+    accessory: { name: 'Аксессуары', desc: 'Решётки, крышки, кочерги и другие аксессуары для костровых чаш, столов и печей' }
   };
+
+  const MAX_SPECS_IN_CARD = 4;
 
   const path = window.location.pathname;
   const categoryMatch = path.match(/^\/catalog\/(\w+)$/);
@@ -202,7 +236,6 @@
       });
     } catch(e) { console.error(e); }
 
-    // Staggered entrance animation
     document.querySelectorAll('.category-card').forEach((card, i) => {
       card.style.animationDelay = (i * 0.15) + 's';
     });
@@ -230,13 +263,10 @@
   function renderProducts(products) {
     const grid = document.getElementById('productsGrid');
     grid.innerHTML = products.map((p, i) => {
-      const specsHtml = p.specs.map(s =>
+      const visibleSpecs = p.specs.slice(0, MAX_SPECS_IN_CARD);
+      const specsHtml = visibleSpecs.map(s =>
         '<div class="p-spec"><span class="p-spec-label">' + esc(s.label) + ':</span> <span class="p-spec-value">' + esc(s.value) + '</span></div>'
       ).join('');
-
-      const optionsHtml = p.options.length ? '<details class="p-options"><summary>Дополнительные опции (' + p.options.length + ')</summary><ul>' +
-        p.options.map(o => '<li><span>' + esc(o.name) + '</span><span>' + formatPrice(o.price) + ' ₸</span></li>').join('') +
-        '</ul></details>' : '';
 
       const imageHtml = p.image_url
         ? '<img src="' + esc(p.image_url) + '" alt="' + esc(p.name) + '" loading="lazy">'
@@ -244,22 +274,113 @@
 
       const waText = encodeURIComponent('Здравствуйте! Интересует: ' + p.name + ' (' + formatPrice(p.price) + ' ₸)');
 
-      return '<article class="product-card" style="animation-delay:' + (i * 0.1) + 's">' +
+      return '<article class="product-card" data-product-id="' + p.id + '" style="animation-delay:' + (i * 0.1) + 's">' +
         '<div class="p-image">' + imageHtml + '</div>' +
         '<div class="p-body">' +
-          '<span class="p-badge p-badge-' + esc(p.category) + '">' + esc(p.badge) + '</span>' +
-          '<span class="p-stock ' + (p.stock_quantity > 0 ? 'p-stock-available' : 'p-stock-unavailable') + '">' + (p.stock_quantity > 0 ? 'В наличии' : 'Нет в наличии') + '</span>' +
+          '<div class="p-badges">' +
+            '<span class="p-badge p-badge-' + esc(p.category) + '">' + esc(p.badge) + '</span>' +
+            '<span class="p-stock ' + (p.stock_quantity > 0 ? 'p-stock-available' : 'p-stock-unavailable') + '">' + (p.stock_quantity > 0 ? 'В наличии' : 'Нет в наличии') + '</span>' +
+          '</div>' +
           '<h3 class="p-name">' + esc(p.name) + '</h3>' +
           '<div class="p-specs">' + specsHtml + '</div>' +
-          optionsHtml +
           '<div class="p-footer">' +
             '<div class="p-price">' + formatPrice(p.price) + ' <small>₸</small></div>' +
-            '<a href="https://wa.me/77763857050?text=' + waText + '" target="_blank" rel="noopener" class="p-order-btn">Заказать</a>' +
+            '<a href="https://wa.me/77763857050?text=' + waText + '" target="_blank" rel="noopener" class="p-order-btn" onclick="event.stopPropagation()">Заказать</a>' +
           '</div>' +
         '</div>' +
       '</article>';
     }).join('');
   }
+
+  // ===== PRODUCT DETAIL MODAL =====
+  const modal = document.getElementById('productDetailModal');
+  const modalContent = document.getElementById('pdModalContent');
+
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) closeModal();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  function closeModal() {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  async function openProductDetail(productId) {
+    try {
+      const res = await fetch('/api/products/' + productId);
+      if (!res.ok) return;
+      const p = await res.json();
+      showProductModal(p);
+    } catch(e) { /* silent */ }
+  }
+
+  function showProductModal(p) {
+    const specsHtml = (p.specs || []).map(s =>
+      '<div class="p-spec"><span class="p-spec-label">' + esc(s.label) + ':</span> <span class="p-spec-value">' + esc(s.value) + '</span></div>'
+    ).join('');
+
+    const descHtml = p.description
+      ? '<p class="pd-desc">' + esc(p.description) + '</p>'
+      : '';
+
+    const recsHtml = p.recommendations && p.recommendations.length
+      ? '<div class="pd-recs"><h4>С этим товаром берут</h4><div class="pd-recs-grid">' +
+        p.recommendations.map(function(rec) {
+          var imgPart = rec.image_url
+            ? '<img src="' + esc(rec.image_url) + '" alt="' + esc(rec.name) + '" class="pd-rec-img">'
+            : '<div class="pd-rec-placeholder"></div>';
+          return '<div class="pd-rec-card" data-product-id="' + rec.id + '">' + imgPart +
+            '<div class="pd-rec-info"><span class="pd-rec-name">' + esc(rec.name) + '</span>' +
+            '<span class="pd-rec-price">' + formatPrice(rec.price) + ' ₸</span></div></div>';
+        }).join('') + '</div></div>'
+      : '';
+
+    const imgHtml = p.image_url
+      ? '<img src="' + esc(p.image_url) + '" alt="' + esc(p.name) + '" class="pd-image">'
+      : '';
+
+    const waText = encodeURIComponent('Здравствуйте! Интересует: ' + p.name + ' (' + formatPrice(p.price) + ' ₸)');
+
+    modalContent.innerHTML =
+      '<button class="pd-close" aria-label="Закрыть">&times;</button>' +
+      imgHtml +
+      '<div class="pd-body">' +
+        '<span class="p-badge p-badge-' + esc(p.category) + '">' + esc(p.badge) + '</span>' +
+        '<span class="p-stock ' + (p.stock_quantity > 0 ? 'p-stock-available' : 'p-stock-unavailable') + '">' + (p.stock_quantity > 0 ? 'В наличии' : 'Нет в наличии') + '</span>' +
+        '<h2 class="pd-name">' + esc(p.name) + '</h2>' +
+        descHtml +
+        '<div class="pd-specs">' + specsHtml + '</div>' +
+        (p.options && p.options.length ? '<div class="pd-acc"><div class="pd-acc-header"><svg class="pd-acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><h4>Совместимые аксессуары</h4></div><div class="pd-acc-grid">' + p.options.map(function(o, idx) { return '<div class="pd-acc-tile" style="animation-delay:' + (idx * 0.06) + 's"><div class="pd-acc-tile-glow"></div><div class="pd-acc-tile-body"><span class="pd-acc-tile-name">' + esc(o.name) + '</span><span class="pd-acc-tile-price">+ ' + formatPrice(o.price) + ' <small>₸</small></span></div></div>'; }).join('') + '</div></div>' : '') +
+        '<div class="pd-price">' + formatPrice(p.price) + ' <small>₸</small></div>' +
+        '<a href="https://wa.me/77763857050?text=' + waText + '" target="_blank" rel="noopener" class="p-order-btn pd-order-btn">Заказать в WhatsApp</a>' +
+        recsHtml +
+      '</div>';
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    modalContent.querySelector('.pd-close').addEventListener('click', closeModal);
+
+    modalContent.querySelectorAll('.pd-rec-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        openProductDetail(parseInt(card.dataset.productId, 10));
+      });
+    });
+  }
+
+  // Click on product card opens detail
+  document.getElementById('productsGrid').addEventListener('click', function(e) {
+    if (e.target.closest('a')) return;
+    var card = e.target.closest('.product-card');
+    if (card) {
+      var id = parseInt(card.dataset.productId, 10);
+      if (id) openProductDetail(id);
+    }
+  });
 
   function formatPrice(n) {
     return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');

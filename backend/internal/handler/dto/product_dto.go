@@ -13,45 +13,50 @@ type ProductOptionDTO struct {
 }
 
 type ProductResponse struct {
-	ID            int64              `json:"id"`
-	Name          string             `json:"name"`
-	Category      string             `json:"category"`
-	Badge         string             `json:"badge"`
-	Price         int                `json:"price"`
-	ImageURL      string             `json:"image_url"`
-	StockQuantity int                `json:"stock_quantity"`
-	Specs         []SpecDTO          `json:"specs"`
-	Options       []ProductOptionDTO `json:"options"`
+	ID              int64                        `json:"id"`
+	Name            string                       `json:"name"`
+	Description     string                       `json:"description"`
+	Category        string                       `json:"category"`
+	Badge           string                       `json:"badge"`
+	Price           int                          `json:"price"`
+	ImageURL        string                       `json:"image_url"`
+	StockQuantity   int                          `json:"stock_quantity"`
+	Specs           []SpecDTO                    `json:"specs"`
+	Options         []ProductOptionDTO           `json:"options"`
+	Recommendations []RecommendationBriefResponse `json:"recommendations,omitempty"`
 }
 
 type CreateProductRequest struct {
-	Name     string             `json:"name"`
-	Category string             `json:"category"`
-	Badge    string             `json:"badge"`
-	Price    int                `json:"price"`
-	ImageURL string             `json:"image_url"`
-	Specs    []SpecDTO          `json:"specs"`
-	Options  []ProductOptionDTO `json:"options"`
+	Name        string             `json:"name"`
+	Description string             `json:"description"`
+	Category    string             `json:"category"`
+	Badge       string             `json:"badge"`
+	Price       int                `json:"price"`
+	ImageURL    string             `json:"image_url"`
+	Specs       []SpecDTO          `json:"specs"`
+	Options     []ProductOptionDTO `json:"options"`
 }
 
 type UpdateProductRequest struct {
-	Name     string             `json:"name"`
-	Category string             `json:"category"`
-	Badge    string             `json:"badge"`
-	Price    int                `json:"price"`
-	ImageURL string             `json:"image_url"`
-	Specs    []SpecDTO          `json:"specs"`
-	Options  []ProductOptionDTO `json:"options"`
+	Name        string             `json:"name"`
+	Description string             `json:"description"`
+	Category    string             `json:"category"`
+	Badge       string             `json:"badge"`
+	Price       int                `json:"price"`
+	ImageURL    string             `json:"image_url"`
+	Specs       []SpecDTO          `json:"specs"`
+	Options     []ProductOptionDTO `json:"options"`
 }
 
 // ToModel converts CreateProductRequest DTO to domain model.
 func (r *CreateProductRequest) ToModel() *model.Product {
 	p := &model.Product{
-		Name:     r.Name,
-		Category: r.Category,
-		Badge:    r.Badge,
-		Price:    r.Price,
-		ImageURL: r.ImageURL,
+		Name:        r.Name,
+		Description: r.Description,
+		Category:    r.Category,
+		Badge:       r.Badge,
+		Price:       r.Price,
+		ImageURL:    r.ImageURL,
 	}
 	for _, s := range r.Specs {
 		p.Specs = append(p.Specs, model.Spec{Label: s.Label, Value: s.Value})
@@ -65,12 +70,13 @@ func (r *CreateProductRequest) ToModel() *model.Product {
 // ToModel converts UpdateProductRequest DTO to domain model with given ID.
 func (r *UpdateProductRequest) ToModel(id int64) *model.Product {
 	p := &model.Product{
-		ID:       id,
-		Name:     r.Name,
-		Category: r.Category,
-		Badge:    r.Badge,
-		Price:    r.Price,
-		ImageURL: r.ImageURL,
+		ID:          id,
+		Name:        r.Name,
+		Description: r.Description,
+		Category:    r.Category,
+		Badge:       r.Badge,
+		Price:       r.Price,
+		ImageURL:    r.ImageURL,
 	}
 	for _, s := range r.Specs {
 		p.Specs = append(p.Specs, model.Spec{Label: s.Label, Value: s.Value})
@@ -94,6 +100,7 @@ func ProductFromModel(p *model.Product) ProductResponse {
 	return ProductResponse{
 		ID:            p.ID,
 		Name:          p.Name,
+		Description:   p.Description,
 		Category:      p.Category,
 		Badge:         p.Badge,
 		Price:         p.Price,
@@ -111,4 +118,28 @@ func ProductsFromModel(products []model.Product) []ProductResponse {
 		result = append(result, ProductFromModel(&products[i]))
 	}
 	return result
+}
+
+// RecommendationBriefsFromModel converts products to brief recommendation DTOs.
+func RecommendationBriefsFromModel(products []model.Product) []RecommendationBriefResponse {
+	result := make([]RecommendationBriefResponse, 0, len(products))
+	for _, p := range products {
+		result = append(result, RecommendationBriefResponse{
+			ID:       p.ID,
+			Name:     p.Name,
+			Price:    p.Price,
+			ImageURL: p.ImageURL,
+			Category: p.Category,
+		})
+	}
+	return result
+}
+
+// AttachRecommendations adds recommendation data to product responses using a preloaded map.
+func AttachRecommendations(responses []ProductResponse, recsMap map[int64][]model.Product) {
+	for i := range responses {
+		if recs, ok := recsMap[responses[i].ID]; ok {
+			responses[i].Recommendations = RecommendationBriefsFromModel(recs)
+		}
+	}
 }
