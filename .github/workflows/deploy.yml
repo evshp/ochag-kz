@@ -18,5 +18,21 @@ jobs:
           script: |
             cd /home/ubuntu/ochag-kz
             git pull origin main
-            docker-compose up -d --build
+            docker compose -f docker-compose.prod.yml up -d --build
             docker image prune -f
+
+      - name: Health check
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sleep 10
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/api/products)
+            if [ "$HTTP_CODE" != "200" ]; then
+              echo "Health check failed: HTTP $HTTP_CODE"
+              docker compose -f /home/ubuntu/ochag-kz/docker-compose.prod.yml logs --tail=50
+              exit 1
+            fi
+            echo "Health check passed: HTTP $HTTP_CODE"
