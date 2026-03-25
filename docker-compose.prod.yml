@@ -15,7 +15,8 @@ services:
       - ./backend/migrations/005_create_inventory.up.sql:/docker-entrypoint-initdb.d/05_inventory.sql:ro
       - ./backend/migrations/006_create_recommendations.up.sql:/docker-entrypoint-initdb.d/06_recommendations.sql:ro
       - ./backend/migrations/007_add_description_and_accessories.up.sql:/docker-entrypoint-initdb.d/07_description.sql:ro
-      - ./backend/migrations/seed.sql:/docker-entrypoint-initdb.d/08_seed.sql:ro
+      - ./backend/migrations/008_update_image_urls.up.sql:/docker-entrypoint-initdb.d/08_update_image_urls.sql:ro
+      - ./backend/migrations/seed.sql:/docker-entrypoint-initdb.d/09_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ochag"]
       interval: 5s
@@ -30,7 +31,7 @@ services:
       DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/ochag?sslmode=disable
       JWT_SECRET: ${JWT_SECRET}
     volumes:
-      - ./backend/web/assets:/app/web/assets:ro
+      - ./backend/web/assets:/app/web/assets
     depends_on:
       db:
         condition: service_healthy

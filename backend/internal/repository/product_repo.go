@@ -11,5 +11,6 @@ type ProductRepository interface {
 	GetByID(ctx context.Context, id int64) (*model.Product, error)
 	Create(ctx context.Context, product *model.Product) (int64, error)
 	Update(ctx context.Context, product *model.Product) error
+	UpdateImageURL(ctx context.Context, id int64, imageURL string) error
 	Delete(ctx context.Context, id int64) error
 }

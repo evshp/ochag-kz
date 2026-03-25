@@ -1,7 +1,11 @@
 package handler
 
 import (
+	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	"ochag-kz/internal/handler/dto"
@@ -140,6 +144,95 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, map[string]string{"message": "deleted"})
+}
+
+// UploadImage handles POST /api/admin/products/{id}/image
+// Accepts multipart/form-data with a "file" field, saves it to web/assets/products/
+func (h *ProductHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid product id")
+		return
+	}
+
+	// Verify product exists
+	if _, err := h.svc.GetByID(r.Context(), id); err != nil {
+		writeError(w, http.StatusNotFound, err.Error())
+		return
+	}
+
+	if err := r.ParseMultipartForm(10 << 20); err != nil { // 10 MB max
+		writeError(w, http.StatusBadRequest, "file too large or invalid form")
+		return
+	}
+
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "missing file field")
+		return
+	}
+	defer file.Close()
+
+	ext := filepath.Ext(header.Filename)
+	if ext == "" {
+		ext = ".jpg"
+	}
+	filename := fmt.Sprintf("product-%d%s", id, ext)
+
+	dir := filepath.Join(".", "web", "assets", "products")
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		writeError(w, http.StatusInternalServerError, "cannot create directory")
+		return
+	}
+
+	dst, err := os.Create(filepath.Join(dir, filename))
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "cannot save file")
+		return
+	}
+	defer dst.Close()
+
+	if _, err := io.Copy(dst, file); err != nil {
+		writeError(w, http.StatusInternalServerError, "cannot write file")
+		return
+	}
+
+	imageURL := "/assets/products/" + filename
+	if err := h.svc.UpdateImageURL(r.Context(), id, imageURL); err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]string{"image_url": imageURL})
+}
+
+// UpdateImageURL handles PATCH /api/admin/products/{id}/image
+// Accepts JSON with {"image_url": "..."} to set URL directly
+func (h *ProductHandler) UpdateImageURL(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid product id")
+		return
+	}
+
+	var req struct {
+		ImageURL string `json:"image_url"`
+	}
+	if err := decodeJSON(r, &req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	if err := h.svc.UpdateImageURL(r.Context(), id, req.ImageURL); err != nil {
+		if err == service.ErrProductNotFound {
+			writeError(w, http.StatusNotFound, err.Error())
+			return
+		}
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]string{"image_url": req.ImageURL})
 }
 
 // SetRecommendations handles PUT /api/admin/products/{id}/recommendations

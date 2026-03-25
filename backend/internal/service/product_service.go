@@ -59,6 +59,14 @@ func (s *ProductService) Update(ctx context.Context, product *model.Product) err
 	return s.repo.Update(ctx, product)
 }
 
+func (s *ProductService) UpdateImageURL(ctx context.Context, id int64, imageURL string) error {
+	_, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return ErrProductNotFound
+	}
+	return s.repo.UpdateImageURL(ctx, id, imageURL)
+}
+
 func (s *ProductService) Delete(ctx context.Context, id int64) error {
 	_, err := s.repo.GetByID(ctx, id)
 	if err != nil {

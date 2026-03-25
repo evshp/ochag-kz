@@ -9,9 +9,16 @@ function esc(str) {
     .replace(/"/g, '&quot;');
 }
 
+function directImageUrl(url) {
+  if (!url) return '';
+  const m = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+  if (m) return 'https://drive.google.com/uc?export=view&id=' + m[1];
+  return url;
+}
+
 function renderRecMini(rec) {
   const imgHtml = rec.image_url
-    ? `<img src="${esc(rec.image_url)}" alt="${esc(rec.name)}" class="rec-mini-img">`
+    ? `<img src="${esc(directImageUrl(rec.image_url))}" alt="${esc(rec.name)}" class="rec-mini-img">`
     : `<div class="rec-mini-placeholder"></div>`;
   return `<div class="rec-mini-card" data-product-id="${rec.id}">
     ${imgHtml}
@@ -42,7 +49,12 @@ function renderCard(p) {
       </div>`
     : '';
 
+  const cardImgHtml = p.image_url
+    ? `<div class="p-image"><img src="${esc(directImageUrl(p.image_url))}" alt="${esc(p.name)}"></div>`
+    : `<div class="p-image"><div class="p-img-placeholder"><svg viewBox="0 0 80 80" fill="currentColor"><circle cx="40" cy="30" r="12"/><path d="M10 70 Q40 40 70 70Z"/></svg></div></div>`;
+
   return `<div class="product-card fade-up" data-cat="${esc(p.category)}" data-product-id="${p.id}">
+    ${cardImgHtml}
     <div class="product-body">
       <span class="product-badge ${badgeClass}">${esc(p.badge)}</span>
       <span class="product-stock ${stockClass}">${stockText}</span>
@@ -122,7 +134,7 @@ function showProductModal(p) {
         <h4>С этим товаром берут</h4>
         <div class="pd-recs-grid">${p.recommendations.map(rec => {
           const imgHtml = rec.image_url
-            ? `<img src="${esc(rec.image_url)}" alt="${esc(rec.name)}" class="pd-rec-img">`
+            ? `<img src="${esc(directImageUrl(rec.image_url))}" alt="${esc(rec.name)}" class="pd-rec-img">`
             : `<div class="pd-rec-placeholder"></div>`;
           return `<div class="pd-rec-card" data-product-id="${rec.id}">
             ${imgHtml}
@@ -136,7 +148,7 @@ function showProductModal(p) {
     : '';
 
   const imgHtml = p.image_url
-    ? `<img src="${esc(p.image_url)}" alt="${esc(p.name)}" class="pd-image">`
+    ? `<img src="${esc(directImageUrl(p.image_url))}" alt="${esc(p.name)}" class="pd-image">`
     : '';
 
   modal.innerHTML = `<div class="pd-modal-content">

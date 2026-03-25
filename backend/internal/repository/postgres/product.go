@@ -173,6 +173,14 @@ func (r *ProductRepo) Update(ctx context.Context, product *model.Product) error 
 	return tx.Commit(ctx)
 }
 
+func (r *ProductRepo) UpdateImageURL(ctx context.Context, id int64, imageURL string) error {
+	_, err := r.pool.Exec(ctx, "UPDATE products SET image_url = $1 WHERE id = $2", imageURL, id)
+	if err != nil {
+		return fmt.Errorf("update image_url: %w", err)
+	}
+	return nil
+}
+
 func (r *ProductRepo) Delete(ctx context.Context, id int64) error {
 	_, err := r.pool.Exec(ctx, "DELETE FROM products WHERE id = $1", id)
 	if err != nil {

@@ -77,6 +77,8 @@ func main() {
 				r.Post("/", productHandler.Create)
 				r.Put("/{id}", productHandler.Update)
 				r.Delete("/{id}", productHandler.Delete)
+				r.Post("/{id}/image", productHandler.UploadImage)
+				r.Patch("/{id}/image", productHandler.UpdateImageURL)
 				r.Get("/{id}/recommendations", productHandler.GetRecommendations)
 				r.Put("/{id}/recommendations", productHandler.SetRecommendations)
 			})
