@@ -21,7 +21,7 @@
     }
   })();
 
-  const categoryLabels = { bowl: 'Костровая чаша', table: 'Костровой стол', oven: 'Печь', accessory: 'Аксессуар' };
+  const categoryLabels = { bowl: 'Костровая чаша', table: 'Костровой стол', oven: 'Камин уличный', accessory: 'Аксессуар' };
 
   async function apiFetch(url, options = {}) {
     const headers = { 'Content-Type': 'application/json', ...options.headers };

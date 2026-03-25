@@ -12,10 +12,10 @@ INSERT INTO products (id, name, category, badge, price, image_url) VALUES
   (4,  'Усовершенствованная костровая чаша с нерж. решёткой D=900мм',  'bowl',  'Костровая чаша', 150000, '/assets/products/product-4.jpg'),
   (5,  'Простая костровая чаша D=900мм',                              'bowl',  'Костровая чаша', 120000, '/assets/products/product-5.jpg'),
   (6,  'Круглый стол D=1200мм',                                       'table', 'Стол',           200000, '/assets/products/product-6.jpg'),
-  (7,  'Печь «Петербург» с коротким дымоходом',                       'oven',  'Печь',           250000, '/assets/products/product-7.jpg'),
-  (8,  'Печь «Петербург» с длинным дымоходом',                        'oven',  'Печь',           270000, '/assets/products/product-8.jpg'),
-  (9,  'Квадратная печь с коротким дымоходом',                        'oven',  'Печь',           180000, '/assets/products/product-9.jpg'),
-  (10, 'Квадратная печь с длинным дымоходом',                         'oven',  'Печь',           200000, '/assets/products/product-10.jpg'),
+  (7,  'Камин уличный «Петербург» с коротким дымоходом',               'oven',  'Камин уличный',  250000, '/assets/products/product-7.jpg'),
+  (8,  'Камин уличный «Петербург» с длинным дымоходом',               'oven',  'Камин уличный',  270000, '/assets/products/product-8.jpg'),
+  (9,  'Камин уличный квадратный с коротким дымоходом',               'oven',  'Камин уличный',  180000, '/assets/products/product-9.jpg'),
+  (10, 'Камин уличный квадратный с длинным дымоходом',                'oven',  'Камин уличный',  200000, '/assets/products/product-10.jpg'),
   (11, 'Костровая чаша «Сфера» D=900мм',                              'bowl',  'Костровая чаша', 110000, '/assets/products/product-11.jpg')
 ON CONFLICT DO NOTHING;
 
