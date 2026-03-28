@@ -114,9 +114,25 @@ func main() {
 			return
 		}
 
-		// SPA routing: /catalog* → catalog.html, everything else → index.html
+		// SPA routing
 		if strings.HasPrefix(req.URL.Path, "/catalog") {
 			http.ServeFile(w, req, filepath.Join(webDir, "catalog.html"))
+			return
+		}
+		if req.URL.Path == "/admin" || req.URL.Path == "/admin/" {
+			http.ServeFile(w, req, filepath.Join(webDir, "admin", "index.html"))
+			return
+		}
+		if req.URL.Path == "/admin/users" {
+			http.ServeFile(w, req, filepath.Join(webDir, "admin", "users.html"))
+			return
+		}
+		if req.URL.Path == "/admin/products" {
+			http.ServeFile(w, req, filepath.Join(webDir, "admin", "products.html"))
+			return
+		}
+		if req.URL.Path == "/admin/stock" {
+			http.ServeFile(w, req, filepath.Join(webDir, "admin", "stock.html"))
 			return
 		}
 		http.ServeFile(w, req, filepath.Join(webDir, "index.html"))
