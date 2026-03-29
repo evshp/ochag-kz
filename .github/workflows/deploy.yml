@@ -9,36 +9,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy via SSH
+      - name: Deploy and ensure SSL
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 10m
           script: |
+            set -e
             cd /home/ubuntu/ochag-kz
             git pull origin main
-            docker compose -f docker-compose.prod.yml up -d --build
-            docker image prune -f
-            # Apply pending migrations to existing database
-            source .env
-            docker compose -f docker-compose.prod.yml exec -T db psql -U "$DB_USER" -d ochag -f /docker-entrypoint-initdb.d/08_update_image_urls.sql 2>/dev/null || true
 
-      - name: Ensure SSL certificate
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /home/ubuntu/ochag-kz
-            NGINX_ID=$(docker compose -f docker-compose.prod.yml ps -q nginx)
-            # Check if real Let's Encrypt cert exists inside the nginx container
-            if docker exec "$NGINX_ID" test -d /etc/letsencrypt/renewal; then
-              echo "Real SSL certificate found, skipping certbot"
+            # Check if real Let's Encrypt cert exists in the volume
+            CERT_EXISTS=$(docker compose -f docker-compose.prod.yml run --rm --entrypoint sh certbot -c \
+              'test -f /etc/letsencrypt/live/ochagi-kaminy.kz/fullchain.pem && echo yes || echo no' 2>/dev/null || echo no)
+
+            if [ "$CERT_EXISTS" = "yes" ]; then
+              echo "=== SSL certificate found — starting with HTTPS ==="
+              docker compose -f docker-compose.prod.yml up -d --build
             else
-              echo "No real SSL certificate — requesting from Let's Encrypt..."
+              echo "=== No SSL certificate — starting HTTP-only to get one ==="
+              # Start with HTTP-only nginx config so certbot can verify domain
+              cp nginx.conf nginx.conf.bak
+              cp nginx-nossl.conf nginx.conf
+              docker compose -f docker-compose.prod.yml up -d --build
+              # Wait for nginx to be ready
               sleep 5
+
+              echo "=== Requesting certificate from Let's Encrypt ==="
               docker compose -f docker-compose.prod.yml run --rm certbot \
                 certbot certonly --webroot \
                 -w /var/www/certbot \
@@ -47,9 +46,17 @@ jobs:
                 --agree-tos \
                 --no-eff-email \
                 --non-interactive
-              echo "Restarting nginx with real certificate..."
+
+              echo "=== Switching to HTTPS config ==="
+              cp nginx.conf.bak nginx.conf
+              rm -f nginx.conf.bak
               docker compose -f docker-compose.prod.yml restart nginx
             fi
+
+            docker image prune -f
+            # Apply pending migrations to existing database
+            source .env
+            docker compose -f docker-compose.prod.yml exec -T db psql -U "$DB_USER" -d ochag -f /docker-entrypoint-initdb.d/08_update_image_urls.sql 2>/dev/null || true
 
       - name: Health check
         uses: appleboy/ssh-action@v1
@@ -59,7 +66,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             sleep 10
-            # Check backend directly (nginx on port 80 redirects to HTTPS)
             BACKEND_ID=$(docker compose -f /home/ubuntu/ochag-kz/docker-compose.prod.yml ps -q backend)
             BACKEND_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$BACKEND_ID")
             HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://${BACKEND_IP}:8080/api/products")
