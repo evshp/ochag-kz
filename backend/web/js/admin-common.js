@@ -23,7 +23,8 @@
   const categoryLabels = { bowl: 'Костровая чаша', table: 'Костровой стол', oven: 'Камин уличный', accessory: 'Аксессуар' };
 
   async function apiFetch(url, options = {}) {
-    const headers = { 'Content-Type': 'application/json', ...options.headers };
+    const headers = { ...options.headers };
+    if (!options.rawBody) headers['Content-Type'] = 'application/json';
     if (adminToken) headers['Authorization'] = 'Bearer ' + adminToken;
     const res = await fetch(url, { ...options, headers });
     if (res.status === 401) {
@@ -61,6 +62,17 @@
     return true;
   }
 
+  // HTML-escape to prevent XSS when inserting user data into innerHTML
+  function esc(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   // Expose globally
   window.AdminCommon = {
     apiFetch,
@@ -69,6 +81,7 @@
     setSession,
     logout,
     requireAuth,
-    categoryLabels
+    categoryLabels,
+    esc
   };
 })();

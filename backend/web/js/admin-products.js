@@ -4,6 +4,7 @@
 
   var user = AdminCommon.getUser();
   var categoryLabels = AdminCommon.categoryLabels;
+  var esc = AdminCommon.esc;
   document.getElementById('sidebarUser').textContent = user.username;
   var roleLabels = { admin: 'Администратор', manager: 'Менеджер', viewer: 'Просмотр' };
   document.getElementById('sidebarRole').textContent = roleLabels[user.role] || user.role;
@@ -25,6 +26,8 @@
   var allAdminProducts = [];
   var activeProductFilter = 'all';
   var editingProductId = null;
+  var pendingImageFile = null;   // file selected but not yet uploaded
+  var currentImageUrl = '';       // existing image URL for edit mode
 
   // ===== LOAD & FILTER =====
   loadAdminProducts();
@@ -109,13 +112,13 @@
 
       var imgHtml;
       if (p.image_url) {
-        imgHtml = '<img class="ap-card-img" src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="ap-card-img--placeholder" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>';
+        imgHtml = '<img class="ap-card-img" src="' + esc(p.image_url) + '" alt="' + esc(p.name) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="ap-card-img--placeholder" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>';
       } else {
         imgHtml = '<div class="ap-card-img--placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>';
       }
 
-      var badgeHtml = p.badge ? '<span class="ap-card-badge">' + p.badge + '</span>' : '';
-      var descHtml = p.description ? '<div class="ap-card-desc">' + p.description + '</div>' : '';
+      var badgeHtml = p.badge ? '<span class="ap-card-badge">' + esc(p.badge) + '</span>' : '';
+      var descHtml = p.description ? '<div class="ap-card-desc">' + esc(p.description) + '</div>' : '';
 
       var specsCount = (p.specs || []).length;
       var optionsCount = (p.options || []).length;
@@ -123,7 +126,7 @@
       if (specsCount > 0) {
         specsHtml = '<div class="ap-card-specs">';
         (p.specs || []).slice(0, 3).forEach(function(s) {
-          specsHtml += '<span class="ap-card-spec">' + s.label + ': <strong>' + s.value + '</strong></span>';
+          specsHtml += '<span class="ap-card-spec">' + esc(s.label) + ': <strong>' + esc(s.value) + '</strong></span>';
         });
         if (specsCount > 3) specsHtml += '<span class="ap-card-spec ap-card-spec--more">+' + (specsCount - 3) + '</span>';
         specsHtml += '</div>';
@@ -142,8 +145,8 @@
 
       card.innerHTML = imgHtml +
         '<div class="ap-card-body">' +
-          '<div class="ap-card-cat">' + catLabel + '</div>' +
-          '<div class="ap-card-name">' + p.name + '</div>' +
+          '<div class="ap-card-cat">' + esc(catLabel) + '</div>' +
+          '<div class="ap-card-name">' + esc(p.name) + '</div>' +
           descHtml +
           specsHtml +
           '<div class="ap-card-meta">' +
@@ -263,6 +266,99 @@
     document.getElementById('optionsContainer').innerHTML = '';
   }
 
+  // ===== IMAGE UPLOAD =====
+  var uploadZone = document.getElementById('imageUploadZone');
+  var fileInput = document.getElementById('imageFileInput');
+  var previewEl = document.getElementById('imagePreview');
+  var previewImg = document.getElementById('imagePreviewImg');
+  var placeholderEl = document.getElementById('imagePlaceholder');
+  var removeBtn = document.getElementById('imageRemoveBtn');
+
+  function showImagePreview(src) {
+    previewImg.src = src;
+    previewEl.style.display = 'flex';
+    placeholderEl.style.display = 'none';
+  }
+
+  function clearImagePreview() {
+    pendingImageFile = null;
+    currentImageUrl = '';
+    previewImg.src = '';
+    previewEl.style.display = 'none';
+    placeholderEl.style.display = 'flex';
+    fileInput.value = '';
+  }
+
+  function handleFileSelect(file) {
+    if (!file) return;
+    var validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      alert('Допустимые форматы: JPG, PNG, WebP');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Файл слишком большой (макс. 10 МБ)');
+      return;
+    }
+    pendingImageFile = file;
+    var reader = new FileReader();
+    reader.onload = function(e) { showImagePreview(e.target.result); };
+    reader.readAsDataURL(file);
+  }
+
+  // Click to select file
+  uploadZone.addEventListener('click', function(e) {
+    if (e.target.closest('.ap-upload-remove')) return;
+    fileInput.click();
+  });
+  fileInput.addEventListener('change', function() {
+    if (this.files && this.files[0]) handleFileSelect(this.files[0]);
+  });
+
+  // Drag & Drop
+  uploadZone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    uploadZone.classList.add('ap-upload--dragover');
+  });
+  uploadZone.addEventListener('dragleave', function() {
+    uploadZone.classList.remove('ap-upload--dragover');
+  });
+  uploadZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    uploadZone.classList.remove('ap-upload--dragover');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileSelect(e.dataTransfer.files[0]);
+    }
+  });
+
+  // Remove image
+  removeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    clearImagePreview();
+  });
+
+  async function uploadImageForProduct(productId) {
+    if (!pendingImageFile) return currentImageUrl;
+    uploadZone.classList.add('ap-upload--uploading');
+    try {
+      var formData = new FormData();
+      formData.append('file', pendingImageFile);
+      var res = await AdminCommon.apiFetch('/api/admin/products/' + productId + '/image', {
+        method: 'POST',
+        body: formData,
+        rawBody: true
+      });
+      if (!res.ok) {
+        var data = await res.json();
+        throw new Error(data.error || 'Ошибка загрузки фото');
+      }
+      var result = await res.json();
+      return result.image_url;
+    } finally {
+      uploadZone.classList.remove('ap-upload--uploading');
+    }
+  }
+
   // ===== EDIT PRODUCT =====
   function startEditProduct(p) {
     editingProductId = p.id;
@@ -275,7 +371,14 @@
     document.getElementById('productPrice').value = p.price;
     document.getElementById('productBadge').value = p.badge || '';
     document.getElementById('productDescription').value = p.description || '';
-    document.getElementById('productImageUrl').value = p.image_url || '';
+    // Image preview for existing product
+    pendingImageFile = null;
+    currentImageUrl = p.image_url || '';
+    if (currentImageUrl) {
+      showImagePreview(currentImageUrl);
+    } else {
+      clearImagePreview();
+    }
     document.getElementById('productSubmitBtn').textContent = 'Сохранить';
     document.getElementById('productCancelBtn').style.display = 'inline-block';
 
@@ -294,7 +397,7 @@
     document.getElementById('productPrice').value = '';
     document.getElementById('productBadge').value = '';
     document.getElementById('productDescription').value = '';
-    document.getElementById('productImageUrl').value = '';
+    clearImagePreview();
     document.getElementById('productSubmitBtn').textContent = 'Добавить';
     document.getElementById('productCancelBtn').style.display = 'none';
     clearDynRows();
@@ -307,22 +410,23 @@
     var price = parseInt(document.getElementById('productPrice').value, 10);
     var badge = document.getElementById('productBadge').value.trim();
     var description = document.getElementById('productDescription').value.trim();
-    var image_url = document.getElementById('productImageUrl').value.trim();
     var specs = getSpecsFromForm();
     var options = getOptionsFromForm();
 
     if (!name) { alert('Введите название товара'); return; }
     if (!price || price <= 0) { alert('Введите корректную цену'); return; }
 
-    var body = { name: name, description: description, category: category, price: price, badge: badge, image_url: image_url, specs: specs, options: options };
+    var body = { name: name, description: description, category: category, price: price, badge: badge, image_url: currentImageUrl, specs: specs, options: options };
 
     try {
       var res;
+      var productId;
       if (editingProductId) {
         res = await AdminCommon.apiFetch('/api/admin/products/' + editingProductId, {
           method: 'PUT',
           body: JSON.stringify(body)
         });
+        productId = editingProductId;
       } else {
         res = await AdminCommon.apiFetch('/api/admin/products', {
           method: 'POST',
@@ -334,6 +438,21 @@
         var data = await res.json();
         alert(data.error || 'Ошибка сохранения товара');
         return;
+      }
+
+      // If creating, get the new product ID from the response
+      if (!editingProductId) {
+        var created = await res.json();
+        productId = created.id;
+      }
+
+      // Upload image if a new file was selected
+      if (pendingImageFile && productId) {
+        try {
+          await uploadImageForProduct(productId);
+        } catch(imgErr) {
+          alert('Товар сохранён, но фото не загрузилось: ' + imgErr.message);
+        }
       }
 
       document.getElementById('productCancelBtn').click();

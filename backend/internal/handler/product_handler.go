@@ -7,12 +7,23 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"ochag-kz/internal/handler/dto"
 	"ochag-kz/internal/service"
 
 	"github.com/go-chi/chi/v5"
 )
+
+// allowedImageExts is a whitelist of allowed file extensions for product images.
+var allowedImageExts = map[string]bool{
+	".jpg": true, ".jpeg": true, ".png": true, ".webp": true,
+}
+
+// allowedImageMIME is a whitelist of allowed MIME types detected by http.DetectContentType.
+var allowedImageMIME = map[string]bool{
+	"image/jpeg": true, "image/png": true, "image/webp": true,
+}
 
 type ProductHandler struct {
 	svc          *service.ProductService
@@ -82,6 +93,11 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := req.Validate(); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	product := req.ToModel()
 	id, err := h.svc.Create(r.Context(), product)
 	if err != nil {
@@ -113,6 +129,11 @@ func (h *ProductHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := req.Validate(); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	product := req.ToModel(id)
 	if err := h.svc.Update(r.Context(), product); err != nil {
 		if err == service.ErrProductNotFound {
@@ -139,7 +160,7 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 			writeError(w, http.StatusNotFound, err.Error())
 			return
 		}
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeInternalError(w, err)
 		return
 	}
 
@@ -173,10 +194,31 @@ func (h *ProductHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	ext := filepath.Ext(header.Filename)
-	if ext == "" {
-		ext = ".jpg"
+	// Validate file extension
+	ext := strings.ToLower(filepath.Ext(header.Filename))
+	if !allowedImageExts[ext] {
+		writeError(w, http.StatusBadRequest, "unsupported file type: only jpg, png, webp allowed")
+		return
 	}
+
+	// Validate content by reading first 512 bytes for MIME detection
+	buf := make([]byte, 512)
+	n, err := file.Read(buf)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "cannot read file")
+		return
+	}
+	detectedMIME := http.DetectContentType(buf[:n])
+	if !allowedImageMIME[detectedMIME] {
+		writeError(w, http.StatusBadRequest, "file content is not a valid image")
+		return
+	}
+	// Reset file reader to beginning
+	if _, err := file.Seek(0, io.SeekStart); err != nil {
+		writeError(w, http.StatusInternalServerError, "cannot process file")
+		return
+	}
+
 	filename := fmt.Sprintf("product-%d%s", id, ext)
 
 	dir := filepath.Join(".", "web", "assets", "products")
@@ -199,40 +241,11 @@ func (h *ProductHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 
 	imageURL := "/assets/products/" + filename
 	if err := h.svc.UpdateImageURL(r.Context(), id, imageURL); err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeInternalError(w, err)
 		return
 	}
 
 	writeJSON(w, http.StatusOK, map[string]string{"image_url": imageURL})
-}
-
-// UpdateImageURL handles PATCH /api/admin/products/{id}/image
-// Accepts JSON with {"image_url": "..."} to set URL directly
-func (h *ProductHandler) UpdateImageURL(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	if err != nil {
-		writeError(w, http.StatusBadRequest, "invalid product id")
-		return
-	}
-
-	var req struct {
-		ImageURL string `json:"image_url"`
-	}
-	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, "invalid request body")
-		return
-	}
-
-	if err := h.svc.UpdateImageURL(r.Context(), id, req.ImageURL); err != nil {
-		if err == service.ErrProductNotFound {
-			writeError(w, http.StatusNotFound, err.Error())
-			return
-		}
-		writeError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	writeJSON(w, http.StatusOK, map[string]string{"image_url": req.ImageURL})
 }
 
 // SetRecommendations handles PUT /api/admin/products/{id}/recommendations
@@ -271,7 +284,7 @@ func (h *ProductHandler) GetRecommendations(w http.ResponseWriter, r *http.Reque
 
 	ids, err := h.recSvc.GetRecommendedIDs(r.Context(), id)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeInternalError(w, err)
 		return
 	}
 

@@ -4,6 +4,7 @@
 
   var user = AdminCommon.getUser();
   var categoryLabels = AdminCommon.categoryLabels;
+  var esc = AdminCommon.esc;
   document.getElementById('sidebarUser').textContent = user.username;
   var roleLabels = { admin: 'Администратор', manager: 'Менеджер', viewer: 'Просмотр' };
   document.getElementById('sidebarRole').textContent = roleLabels[user.role] || user.role;
@@ -46,8 +47,8 @@
       card.innerHTML =
         '<div class="sk-card-main">' +
           '<div class="sk-info">' +
-            '<span class="sk-cat">' + catLabel + '</span>' +
-            '<h4 class="sk-name">' + item.product_name + '</h4>' +
+            '<span class="sk-cat">' + esc(catLabel) + '</span>' +
+            '<h4 class="sk-name">' + esc(item.product_name) + '</h4>' +
             '<span class="sk-status ' + statusClass + '">' + statusText + '</span>' +
           '</div>' +
           '<div class="sk-qty-block">' +
@@ -58,7 +59,7 @@
         '</div>' +
         '<div class="sk-actions">' +
           '<button class="sk-link" data-action="adjust" data-id="' + item.product_id + '">Корректировка</button>' +
-          '<button class="sk-link" data-action="logs" data-id="' + item.product_id + '" data-name="' + item.product_name + '">История</button>' +
+          '<button class="sk-link" data-action="logs" data-id="' + item.product_id + '" data-name="' + esc(item.product_name) + '">История</button>' +
         '</div>' +
         '<div class="sk-adjust" id="skAdjust_' + item.product_id + '">' +
           '<div class="sk-adjust-row">' +
@@ -167,7 +168,7 @@
       return;
     }
 
-    var html = '<div class="sk-logs-title">История: ' + productName + '</div><div class="sk-logs-list">';
+    var html = '<div class="sk-logs-title">История: ' + esc(productName) + '</div><div class="sk-logs-list">';
     logs.forEach(function(l) {
       var date = new Date(l.created_at).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
       var cls = l.delta > 0 ? 'sk-log-plus' : 'sk-log-minus';
@@ -175,7 +176,7 @@
       html += '<div class="sk-log-row">' +
         '<span class="sk-log-date">' + date + '</span>' +
         '<span class="sk-log-delta ' + cls + '">' + sign + l.delta + '</span>' +
-        '<span class="sk-log-reason">' + (l.reason || '\u2014') + '</span>' +
+        '<span class="sk-log-reason">' + esc(l.reason || '\u2014') + '</span>' +
       '</div>';
     });
     html += '</div>';

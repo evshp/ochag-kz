@@ -1,5 +1,8 @@
 # Секреты — никогда не коммитить!
 .env
+*.pem
+*.key
+*.crt
 
 # Node.js
 node_modules/
@@ -11,9 +14,17 @@ api/node_modules/
 # IDE
 .idea/
 .vscode/
+*.swp
+*.swo
+*.bak
 
 # Go build
 backend/bin/
+tmp/
+
+# Go test/profile
+coverage.out
+*.prof
 
 # Логи
 *.log
@@ -23,3 +34,6 @@ backend/bin/
 
 # Прайс-листы (конфиденциальные)
 *.xlsx
+
+# Docker локальные переопределения
+docker-compose.override.yml

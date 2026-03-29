@@ -11,9 +11,8 @@ import (
 type contextKey string
 
 const (
-	ctxUserID   contextKey = "user_id"
-	ctxUsername contextKey = "username"
-	ctxRole    contextKey = "role"
+	ctxUserID contextKey = "user_id"
+	ctxRole   contextKey = "role"
 )
 
 func JWTAuth(authSvc *service.AuthService) func(http.Handler) http.Handler {
@@ -31,14 +30,13 @@ func JWTAuth(authSvc *service.AuthService) func(http.Handler) http.Handler {
 				return
 			}
 
-			userID, username, role, err := authSvc.ValidateToken(token)
+			userID, _, role, err := authSvc.ValidateToken(token)
 			if err != nil {
 				http.Error(w, `{"error":"invalid or expired token"}`, http.StatusUnauthorized)
 				return
 			}
 
 			ctx := context.WithValue(r.Context(), ctxUserID, userID)
-			ctx = context.WithValue(ctx, ctxUsername, username)
 			ctx = context.WithValue(ctx, ctxRole, role)
 
 			next.ServeHTTP(w, r.WithContext(ctx))

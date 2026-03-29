@@ -24,14 +24,14 @@ func NewInventoryHandler(inventorySvc *service.InventoryService, productSvc *ser
 func (h *InventoryHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	items, err := h.inventorySvc.GetAll(r.Context())
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeInternalError(w, err)
 		return
 	}
 
 	// Get product names for display
 	products, err := h.productSvc.GetAll(r.Context(), "")
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeInternalError(w, err)
 		return
 	}
 
@@ -91,7 +91,7 @@ func (h *InventoryHandler) GetLogs(w http.ResponseWriter, r *http.Request) {
 
 	logs, err := h.inventorySvc.GetLogs(r.Context(), productID)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeInternalError(w, err)
 		return
 	}
 

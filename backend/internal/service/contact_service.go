@@ -11,6 +11,7 @@ import (
 var (
 	ErrEmptyContactName  = errors.New("name is required")
 	ErrEmptyContactPhone = errors.New("phone is required")
+	ErrContactFieldTooLong = errors.New("field too long (max 500 characters)")
 )
 
 type ContactService struct {
@@ -27,6 +28,9 @@ func (s *ContactService) Create(ctx context.Context, name, phone, message string
 	}
 	if phone == "" {
 		return 0, ErrEmptyContactPhone
+	}
+	if len(name) > 500 || len(phone) > 500 || len(message) > 5000 {
+		return 0, ErrContactFieldTooLong
 	}
 
 	req := &model.ContactRequest{

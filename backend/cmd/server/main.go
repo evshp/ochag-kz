@@ -54,18 +54,23 @@ func main() {
 	contactHandler := handler.NewContactHandler(contactSvc)
 	inventoryHandler := handler.NewInventoryHandler(inventorySvc, productSvc)
 
+	// Rate limiters
+	loginLimiter := middleware.NewRateLimiter(5, time.Minute)    // 5 attempts per minute per IP
+	contactLimiter := middleware.NewRateLimiter(3, time.Minute)  // 3 submissions per minute per IP
+
 	// Router
 	r := chi.NewRouter()
 	r.Use(chimw.Logger)
 	r.Use(chimw.Recoverer)
+	r.Use(securityHeaders)
 	r.Use(corsMiddleware)
 
 	// Public API
 	r.Route("/api", func(r chi.Router) {
 		r.Get("/products", productHandler.GetAll)
 		r.Get("/products/{id}", productHandler.GetByID)
-		r.Post("/contact", contactHandler.Create)
-		r.Post("/auth/login", authHandler.Login)
+		r.With(contactLimiter.Middleware).Post("/contact", contactHandler.Create)
+		r.With(loginLimiter.Middleware).Post("/auth/login", authHandler.Login)
 
 		// Admin API (JWT required)
 		r.Route("/admin", func(r chi.Router) {
@@ -78,7 +83,6 @@ func main() {
 				r.Put("/{id}", productHandler.Update)
 				r.Delete("/{id}", productHandler.Delete)
 				r.Post("/{id}/image", productHandler.UploadImage)
-				r.Patch("/{id}/image", productHandler.UpdateImageURL)
 				r.Get("/{id}/recommendations", productHandler.GetRecommendations)
 				r.Put("/{id}/recommendations", productHandler.SetRecommendations)
 			})
@@ -91,13 +95,13 @@ func main() {
 				r.Get("/{productID}/logs", inventoryHandler.GetLogs)
 			})
 
-			// Users — admin only for create/delete/role, all authenticated for list
-			r.Get("/users", authHandler.GetUsers)
-			r.Group(func(r chi.Router) {
+			// Users — admin only
+			r.Route("/users", func(r chi.Router) {
 				r.Use(middleware.RequireRole("admin"))
-				r.Post("/users", authHandler.CreateUser)
-				r.Put("/users/{id}/role", authHandler.UpdateRole)
-				r.Delete("/users/{id}", authHandler.DeleteUser)
+				r.Get("/", authHandler.GetUsers)
+				r.Post("/", authHandler.CreateUser)
+				r.Put("/{id}/role", authHandler.UpdateRole)
+				r.Delete("/{id}", authHandler.DeleteUser)
 			})
 		})
 	})
@@ -165,11 +169,41 @@ func main() {
 	log.Println("Server stopped")
 }
 
+func securityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "SAMEORIGIN")
+		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+		w.Header().Set("X-XSS-Protection", "1; mode=block")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'")
+		next.ServeHTTP(w, r)
+	})
+}
+
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		origin := r.Header.Get("Origin")
+		// Allow same-origin and configured origins only
+		allowed := origin == "" // same-origin requests have no Origin header
+		allowedOrigins := []string{
+			"http://localhost:8080",
+			"https://ochagi-kaminy.kz",
+			"https://www.ochagi-kaminy.kz",
+		}
+		for _, o := range allowedOrigins {
+			if origin == o {
+				allowed = true
+				break
+			}
+		}
+
+		if allowed && origin != "" {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+		}
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("Access-Control-Max-Age", "3600")
 
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)

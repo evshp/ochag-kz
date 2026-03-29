@@ -48,3 +48,8 @@ INSERT INTO product_options (product_id, name, price) VALUES
   (8, 'Чугунная сковорода', 15000),
   (11, 'Решётка из нерж. стали', 10000)
 ON CONFLICT DO NOTHING;
+
+-- Initialize inventory for all seeded products
+INSERT INTO inventory (product_id, quantity)
+SELECT id, 0 FROM products
+ON CONFLICT (product_id) DO NOTHING;

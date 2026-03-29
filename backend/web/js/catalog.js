@@ -28,7 +28,7 @@ function renderRecMini(rec) {
 }
 
 function renderCard(p) {
-  const badgeClass = p.category === 'bowl' ? 'badge-bowl' : p.category === 'table' ? 'badge-table' : 'badge-oven';
+  const badgeClass = p.category === 'bowl' ? 'p-badge-bowl' : p.category === 'table' ? 'p-badge-table' : 'p-badge-oven';
   const specsHtml = (p.specs || []).map(s =>
     `<div class="spec"><span class="spec-label">${esc(s.label)}:</span><span class="spec-value">${esc(s.value)}</span></div>`
   ).join('');
@@ -39,7 +39,7 @@ function renderCard(p) {
     : '';
   const waText = encodeURIComponent(`Здравствуйте! Интересует ${p.name}`);
 
-  const stockClass = p.stock_quantity > 0 ? 'stock-available' : 'stock-unavailable';
+  const stockClass = p.stock_quantity > 0 ? 'p-stock-available' : 'p-stock-unavailable';
   const stockText = p.stock_quantity > 0 ? 'В наличии' : 'Нет в наличии';
 
   const recsHtml = p.recommendations && p.recommendations.length
@@ -76,7 +76,6 @@ function renderProducts(products) {
   allProducts = products;
   const grid = document.getElementById('products-grid');
   grid.innerHTML = products.map(renderCard).join('');
-  initFilter();
   initScrollAnimations();
 }
 
@@ -87,7 +86,8 @@ async function loadProducts() {
     const products = await res.json();
     renderProducts(products);
   } catch(e) {
-    document.getElementById('products-loading').textContent = 'Не удалось загрузить каталог. Попробуйте позже.';
+    const grid = document.getElementById('products-grid');
+    if (grid) grid.innerHTML = '<p style="text-align:center;color:var(--text-secondary);">Не удалось загрузить каталог. Попробуйте позже.</p>';
   }
 }
 
@@ -126,7 +126,7 @@ function showProductModal(p) {
     : '';
 
   const waText = encodeURIComponent(`Здравствуйте! Интересует ${p.name}`);
-  const stockClass = p.stock_quantity > 0 ? 'stock-available' : 'stock-unavailable';
+  const stockClass = p.stock_quantity > 0 ? 'p-stock-available' : 'p-stock-unavailable';
   const stockText = p.stock_quantity > 0 ? 'В наличии' : 'Нет в наличии';
 
   const recsHtml = p.recommendations && p.recommendations.length
@@ -184,27 +184,6 @@ window.closeProductModal = function() {
     document.body.style.overflow = '';
   }
 };
-
-// ===== CATALOG FILTER =====
-function initFilter() {
-  const tabs = document.querySelectorAll('.tab-btn');
-  const cards = document.querySelectorAll('.product-card');
-  const activeFilter = document.querySelector('.tab-btn.active')?.dataset.filter || 'all';
-  cards.forEach(c => {
-    c.classList.toggle('hidden', activeFilter !== 'all' && c.dataset.cat !== activeFilter);
-  });
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => { t.classList.remove('active'); t.removeAttribute('aria-current'); });
-      tab.classList.add('active');
-      tab.setAttribute('aria-current', 'true');
-      const f = tab.dataset.filter;
-      document.querySelectorAll('.product-card').forEach(c => {
-        c.classList.toggle('hidden', f !== 'all' && c.dataset.cat !== f);
-      });
-    });
-  });
-}
 
 // ===== CLICK HANDLERS =====
 document.addEventListener('click', function(e) {

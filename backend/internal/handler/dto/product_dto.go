@@ -1,6 +1,20 @@
 package dto
 
-import "ochag-kz/internal/model"
+import (
+	"errors"
+
+	"ochag-kz/internal/model"
+)
+
+const (
+	maxNameLen        = 200
+	maxDescriptionLen = 5000
+	maxBadgeLen       = 100
+	maxImageURLLen    = 2048
+	maxSpecLabelLen   = 100
+	maxSpecValueLen   = 200
+	maxOptionNameLen  = 200
+)
 
 type SpecDTO struct {
 	Label string `json:"label"`
@@ -46,6 +60,40 @@ type UpdateProductRequest struct {
 	ImageURL    string             `json:"image_url"`
 	Specs       []SpecDTO          `json:"specs"`
 	Options     []ProductOptionDTO `json:"options"`
+}
+
+func validateProductFields(name, description, badge, imageURL string, specs []SpecDTO, options []ProductOptionDTO) error {
+	if len(name) > maxNameLen {
+		return errors.New("name too long (max 200)")
+	}
+	if len(description) > maxDescriptionLen {
+		return errors.New("description too long (max 5000)")
+	}
+	if len(badge) > maxBadgeLen {
+		return errors.New("badge too long (max 100)")
+	}
+	if len(imageURL) > maxImageURLLen {
+		return errors.New("image_url too long (max 2048)")
+	}
+	for _, s := range specs {
+		if len(s.Label) > maxSpecLabelLen || len(s.Value) > maxSpecValueLen {
+			return errors.New("spec label/value too long")
+		}
+	}
+	for _, o := range options {
+		if len(o.Name) > maxOptionNameLen {
+			return errors.New("option name too long")
+		}
+	}
+	return nil
+}
+
+func (r *CreateProductRequest) Validate() error {
+	return validateProductFields(r.Name, r.Description, r.Badge, r.ImageURL, r.Specs, r.Options)
+}
+
+func (r *UpdateProductRequest) Validate() error {
+	return validateProductFields(r.Name, r.Description, r.Badge, r.ImageURL, r.Specs, r.Options)
 }
 
 // ToModel converts CreateProductRequest DTO to domain model.

@@ -14,7 +14,6 @@ import (
 
 var (
 	ErrInvalidCredentials = errors.New("invalid username or password")
-	ErrUserNotFound       = errors.New("user not found")
 	ErrUserExists         = errors.New("user already exists")
 	ErrInvalidRole        = errors.New("invalid role: must be admin, manager, or viewer")
 	ErrEmptyUsername      = errors.New("username is required")
@@ -76,11 +75,20 @@ func (s *AuthService) ValidateToken(tokenString string) (int64, string, string, 
 		return 0, "", "", errors.New("invalid token")
 	}
 
-	userID := int64(claims["user_id"].(float64))
-	username := claims["username"].(string)
-	role := claims["role"].(string)
+	userIDFloat, ok := claims["user_id"].(float64)
+	if !ok {
+		return 0, "", "", errors.New("invalid token: missing user_id")
+	}
+	username, ok := claims["username"].(string)
+	if !ok {
+		return 0, "", "", errors.New("invalid token: missing username")
+	}
+	role, ok := claims["role"].(string)
+	if !ok {
+		return 0, "", "", errors.New("invalid token: missing role")
+	}
 
-	return userID, username, role, nil
+	return int64(userIDFloat), username, role, nil
 }
 
 func (s *AuthService) GetAllUsers(ctx context.Context) ([]model.User, error) {

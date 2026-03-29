@@ -227,48 +227,6 @@
 .btn-delete { color: #e86050; border: 1px solid rgba(220, 60, 60, 0.3); }
 .btn-delete:hover { background: rgba(220, 60, 60, 0.1); }
 
-.admin-no-perm {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  text-align: center;
-  padding: 2rem;
-  opacity: 0.6;
-}
-
-/* ===== TOOLBAR ===== */
-.admin-toolbar {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  padding: 0.4rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-}
-
-.admin-tab {
-  flex: 1;
-  padding: 0.65rem 1rem;
-  background: none;
-  border: none;
-  border-radius: 8px;
-  color: var(--text-secondary);
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-.admin-tab:hover {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.03);
-}
-.admin-tab.active {
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  color: #fff;
-  font-weight: 600;
-}
-
 /* ===== SHARED: BUTTONS ===== */
 .ap-btn {
   padding: 0.55rem 1.2rem;
@@ -403,6 +361,100 @@
 .ap-input:focus { border-color: var(--accent); }
 .ap-input::placeholder { color: var(--text-secondary); opacity: 0.45; }
 select.ap-input option { background: var(--bg-dark); }
+
+/* ===== IMAGE UPLOAD ZONE ===== */
+.ap-upload {
+  position: relative;
+  border: 2px dashed rgba(232, 119, 46, 0.3);
+  border-radius: 12px;
+  background: rgba(232, 119, 46, 0.03);
+  transition: all 0.25s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+.ap-upload:hover,
+.ap-upload.ap-upload--dragover {
+  border-color: var(--accent);
+  background: rgba(232, 119, 46, 0.08);
+}
+.ap-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 2rem 1rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+.ap-upload-placeholder svg {
+  width: 32px;
+  height: 32px;
+  stroke: var(--accent);
+  opacity: 0.6;
+  margin-bottom: 0.3rem;
+}
+.ap-upload-placeholder em {
+  color: var(--accent);
+  font-style: normal;
+  text-decoration: underline;
+}
+.ap-upload-hint {
+  font-size: 0.68rem;
+  opacity: 0.5;
+}
+.ap-upload-preview {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  min-height: 160px;
+}
+.ap-upload-preview img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.ap-upload-remove {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.ap-upload-remove:hover {
+  background: #e74c3c;
+}
+.ap-upload--uploading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+.ap-upload--uploading::after {
+  content: 'Загрузка...';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13, 9, 7, 0.7);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 12px;
+}
 
 /* Dynamic spec/option rows */
 .ap-dynlist {
