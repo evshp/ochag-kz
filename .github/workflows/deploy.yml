@@ -24,6 +24,33 @@ jobs:
             source .env
             docker compose -f docker-compose.prod.yml exec -T db psql -U "$DB_USER" -d ochag -f /docker-entrypoint-initdb.d/08_update_image_urls.sql 2>/dev/null || true
 
+      - name: Ensure SSL certificate
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/ochag-kz
+            NGINX_ID=$(docker compose -f docker-compose.prod.yml ps -q nginx)
+            # Check if real Let's Encrypt cert exists inside the nginx container
+            if docker exec "$NGINX_ID" test -d /etc/letsencrypt/renewal; then
+              echo "Real SSL certificate found, skipping certbot"
+            else
+              echo "No real SSL certificate — requesting from Let's Encrypt..."
+              sleep 5
+              docker compose -f docker-compose.prod.yml run --rm certbot \
+                certbot certonly --webroot \
+                -w /var/www/certbot \
+                -d ochagi-kaminy.kz -d www.ochagi-kaminy.kz \
+                --email ${{ secrets.SSL_EMAIL }} \
+                --agree-tos \
+                --no-eff-email \
+                --non-interactive
+              echo "Restarting nginx with real certificate..."
+              docker compose -f docker-compose.prod.yml restart nginx
+            fi
+
       - name: Health check
         uses: appleboy/ssh-action@v1
         with:
@@ -32,7 +59,10 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             sleep 10
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/api/products)
+            # Check backend directly (nginx on port 80 redirects to HTTPS)
+            BACKEND_ID=$(docker compose -f /home/ubuntu/ochag-kz/docker-compose.prod.yml ps -q backend)
+            BACKEND_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$BACKEND_ID")
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://${BACKEND_IP}:8080/api/products")
             if [ "$HTTP_CODE" != "200" ]; then
               echo "Health check failed: HTTP $HTTP_CODE"
               docker compose -f /home/ubuntu/ochag-kz/docker-compose.prod.yml logs --tail=50
